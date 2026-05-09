@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Node (if added later)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.env
+.env.local
+
+

@@ -1,10 +1,20 @@
 // Gathering all the fields from the HTML file
-const inputAge = document.getElementById("age").value
-const inputWeight = document.getElementById("weight").value
-const inputHeight = document.getElementById("height").value
-const dropDownGender = document.getElementById("gender").value
-const dropDownActivityLevel = document.getElementById("activity-level").value
-const dropDownGoal = document.getElementById("goal")
+function calculate() {
+    const inputAge = parseInt(document.getElementById("age").value)
+    const inputWeight = parseFloat(document.getElementById("weight").value)
+    const inputHeight = parseFloat(document.getElementById("height").value)
+    const dropDownGender = document.getElementById("gender").value
+    const dropDownActivityLevel = document.getElementById("activity-level").value
+    const dropDownGoal = document.getElementById("goal").value
+
+    const bmiResult = bmi(inputWeight, inputHeight)
+    const tdeeResult = tdee(inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivityLevel)
+    const goalCalories = calorieGoal(tdeeResult, dropDownGoal)
+
+    console.log(`BMI: ${bmiResult}`)
+    console.log(`TDEE: ${tdeeResult}`)
+    console.log(`Goal Calorie: ${goalCalories}`)
+}
 
 /**
  * BMI calculator
@@ -40,8 +50,8 @@ const bmrWOMEN = (inputWeight, inputHeight, inputAge) =>
  * Multipliers: sedentary=1.2, light=1.375, moderate=1.55, active=1.725, very active=1.9
  */
 
-const tdeeMEN = () => {
-    var multipliers = 0
+const tdee = (inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivityLevel) => {
+    let multipliers = 0
     switch (dropDownActivityLevel) {
         case "sedentary":
             multipliers = 1.2
@@ -59,6 +69,30 @@ const tdeeMEN = () => {
             multipliers = 1.9
             break
     }
-    bmrMEN(inputWeight, inputHeight, inputAge) * multipliers
+    switch (dropDownGender) {
+        case "female":
+            return bmrWOMEN(inputWeight, inputHeight, inputAge) * multipliers
+        default:
+            return bmrMEN(inputWeight, inputHeight, inputAge) * multipliers
+    }
+    
+}
 
+/**
+ * Calorie Goal Adjustment
+ * For weight loss: Calorie Goal = TDEE - 500
+ * For weight gain: Calorie Goal = TDEE + 500
+ * For maintenance: Calorie Goal = TDEE
+ */
+
+const calorieGoal = (tdee, dropDownGoal) => 
+{
+    switch (dropDownGoal) {
+        case "weight-loss":
+            return tdee - 500
+        case "weight-gain":
+            return tdee + 500
+        default:
+            return tdee
+    }
 }
