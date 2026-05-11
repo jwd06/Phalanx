@@ -1,0 +1,35 @@
+#top-menu ul li {
+    display: inline;
+    overflow: hidden;
+    list-style-type: none;
+    margin-left: 0px;
+    margin-right: 16px;
+    cursor: pointer;
+}
+
+#top-menu ul li.active-menu a {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#unit-switcher {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+}
+
+#unit-switcher li {
+    display: inline-block;
+    margin-right: 12px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#unit-switcher li.active-unit {
+    font-weight: bold;
+    background-color: #e0e0e0;
+    border-color: #888;
+}
+
