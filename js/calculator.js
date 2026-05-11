@@ -1,19 +1,41 @@
+import { currentUnit } from './app.js'
+
 // Gathering all the fields from the HTML file
-function calculate() {
+export default function calculate() {
     const inputAge = parseInt(document.getElementById("age").value)
-    const inputWeight = parseFloat(document.getElementById("weight").value)
-    const inputHeight = parseFloat(document.getElementById("height").value)
     const dropDownGender = document.getElementById("gender").value
+
+    let inputWeight, inputHeight
+    if (currentUnit === 'us') {
+        inputWeight = parseFloat(document.getElementById("weight").value) * 0.453592
+        const ft = parseFloat(document.getElementById("height-ft").value) || 0
+        const inches = parseFloat(document.getElementById("height-in").value) || 0
+        inputHeight = (ft * 12 + inches) * 2.54
+    } else {
+        inputWeight = parseFloat(document.getElementById("weight").value)
+        inputHeight = parseFloat(document.getElementById("height").value)
+    }
     const dropDownActivityLevel = document.getElementById("activity-level").value
     const dropDownGoal = document.getElementById("goal").value
+
+    const error = validationInputs(inputAge, inputWeight, inputHeight)
+    if (error){
+        const errorMsg = document.getElementById("results")
+        errorMsg.innerHTML = `<p style="color:red">${error}</p>`
+        return
+    }
 
     const bmiResult = bmi(inputWeight, inputHeight)
     const tdeeResult = tdee(inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivityLevel)
     const goalCalories = calorieGoal(tdeeResult, dropDownGoal)
+    const bmiRangeRes = bmiRange(inputWeight, inputHeight)
 
-    console.log(`BMI: ${bmiResult}`)
-    console.log(`TDEE: ${tdeeResult}`)
-    console.log(`Goal Calorie: ${goalCalories}`)
+    const resultsDiv = document.getElementById("results")
+    resultsDiv.innerHTML = `
+        <p>BMI: ${bmiResult.toFixed(2)} Range: ${bmiRangeRes}</p>
+        <p>TDEE: ${tdeeResult.toFixed(0)} kcal/day</p>
+        <p>Goal Calories: ${goalCalories.toFixed(0)} kcal/day</p>
+    `
 }
 
 /**
@@ -24,24 +46,36 @@ function calculate() {
 
 const bmi = (inputWeight, inputHeight) => 
 {
-    return inputWeight / (inputHeight * inputHeight)
+    const heightInMeters = inputHeight/100
+    return inputWeight / (heightInMeters * heightInMeters)
+}
+
+const bmiRange = (inputWeight, inputHeight) =>
+{
+    const bmiRes = bmi(inputWeight, inputHeight)
+    if (bmiRes < 18.5) return "Underweight"
+    if (bmiRes <= 24.9) return "Healthy Weight"
+    if (bmiRes <= 29.9) return "Overweight"
+    if (bmiRes <= 34.9) return "Obesity Class I"
+    if (bmiRes <= 39.9) return "Obesity Class II"
+    return "Obesity Class III (Severe)"
 }
 
 /**
  * Calorie Calculator
- *  Calories — Harris-Benedict BMR formula
- * Men:   BMR = 88.362 + (13.397 × kg) + (4.799 × cm) − (5.677 × age)
- * Women: BMR = 447.593 + (9.247 × kg) + (3.098 × cm) − (4.330 × age)
+ *  Calories — Mifflin-St Jeor Equation:
+ * Men:   BMR = 10W + 6.25H - 5A + 5
+ * Women: BMR = 10W + 6.25H - 5A - 161
  */
 
 const bmrMEN = (inputWeight, inputHeight, inputAge) =>
 {
-    return 88.362 + (13.397 * inputWeight) + (4.799 * inputHeight) - (5.677 * inputAge)
+    return ((10 * inputWeight) + (6.25 * inputHeight) - (5 * inputAge) + 5)
 }
 
 const bmrWOMEN = (inputWeight, inputHeight, inputAge) =>
 {
-    return 447.593 + (9.247 * inputWeight) + (3.098 * inputHeight) - (4.330 * inputAge)
+    return ((10 * inputWeight) + (6.25 * inputHeight) - (5 * inputAge) - 161)
 }
 
 /**
@@ -50,7 +84,8 @@ const bmrWOMEN = (inputWeight, inputHeight, inputAge) =>
  * Multipliers: sedentary=1.2, light=1.375, moderate=1.55, active=1.725, very active=1.9
  */
 
-const tdee = (inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivityLevel) => {
+const tdee = (inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivityLevel) =>
+{
     let multipliers = 0
     switch (dropDownActivityLevel) {
         case "sedentary":
@@ -88,9 +123,9 @@ const tdee = (inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivi
 const calorieGoal = (tdee, dropDownGoal) => 
 {
     switch (dropDownGoal) {
-        case "weight-loss":
+        case "lose-weight":
             return tdee - 500
-        case "weight-gain":
+        case "gain-weight":
             return tdee + 500
         default:
             return tdee
