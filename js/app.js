@@ -1,4 +1,8 @@
+import { inject } from '@vercel/analytics';
 import calculate, { refreshMacros } from './calculator.js'
+
+// Initialize Vercel Web Analytics
+inject();
 
 export let currentUnit = 'metric'
 export const macroPct = { protein: 30, carbs: 50, fat: 20 }

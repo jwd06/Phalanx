@@ -1,0 +1,25 @@
+{
+  "name": "phalanx",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Fitness and nutrition calculator",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "echo 'No linter configured'"
+  },
+  "keywords": [
+    "fitness",
+    "nutrition",
+    "calculator"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  },
+  "devDependencies": {
+    "vite": "^8.0.12"
+  }
+}
