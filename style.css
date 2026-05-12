@@ -33,3 +33,136 @@
     border-color: #888;
 }
 
+.active-offset {
+    display: block;
+    
+}
+
+.slidecontainer {
+
+    width: 100%;
+}
+
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #d3d3d3;
+    outline: none;
+    cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1a73e8;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1a73e8;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.slider::-moz-range-progress {
+    background: #1a73e8;
+    height: 6px;
+    border-radius: 3px;
+}
+
+.slider::-moz-range-track {
+    background: #d3d3d3;
+    height: 6px;
+    border-radius: 3px;
+}
+
+/* Macro mode switcher */
+#mac-mode-selector {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 12px 0;
+}
+
+#mac-mode-selector li {
+    display: inline-block;
+    margin-right: 8px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#mac-mode-selector li.active-macro {
+    font-weight: bold;
+    background-color: #e0e0e0;
+    border-color: #888;
+}
+
+/* Slider section */
+#macro-slider-selection {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.slider-hint {
+    margin: 0 0 10px 0;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.slider-row {
+    margin-bottom: 10px;
+}
+
+.slider-row label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+}
+
+/* Macro results table */
+.macro-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.macro-table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+}
+
+.macro-label {
+    background-color: #f5f5f5;
+    font-weight: 500;
+    width: 35%;
+}
+
+.macro-value {
+    background-color: #e8f5e9;
+    text-align: right;
+}
+
+.macro-value strong {
+    display: block;
+}
+
+.macro-range {
+    font-size: 0.82em;
+    color: #777;
+}
+
