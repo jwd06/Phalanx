@@ -68,16 +68,42 @@
                 <option value="moderate">Moderate (exercise 4-5 times/week)</option>
                 <option value="active">Active (daily exercise or intense exercise 3-4 times/week)</option>
                 <option value="very-active">Very Active (intense exercise 6-7 times/week)</option>
+                <option value="extra-active">Extra Active (physical job)</option>
+                <option value="athlete">Athlete</option>
             </select>
             <br><br>
 
             <label for="goal">Goal: </label>
             <select name="goal" id="goal">
-                <option value="gain-weight">Gain Weight</option>
                 <option value="maintain-weight">Maintain Weight</option>
+                <option value="gain-weight">Gain Weight</option>
                 <option value="lose-weight">Lose Weight</option>
             </select>
             <br><br>
+
+            <!--Calorie Offset for Weigth Loss-->
+            <div id="calorie-offset-weight-loss" style="display: none;">
+                <label for="calorie-offset-weight-loss">Calorie Offset</label>
+                <select name="calorie-offset-wl" id="calorie-offset-wl">
+                    <option value="mild">Mild Weight Loss</option>
+                    <option value="normal">Weight Loss</option>
+                    <option value="extreme">Extreme Weight Loss</option>
+                </select>
+                <br><br>
+            </div>
+
+
+            <!--Calorie Offset for Weigth Gain-->
+            <div id="calorie-offset-weight-gain" style="display: none;">
+                <label for="calorie-offset-weight-gain">Calorie Offset</label>
+                <select name="calorie-offset-wg" id="calorie-offset-wg">
+                    <option value="mild">Mild Weight Gain</option>
+                    <option value="normal">Weight Gain</option>
+                    <option value="extreme">Extreme Weight Gain</option>
+                </select>
+                <br><br>
+            </div>
+
 
             <button type="button" id="calculate-button">Calculate</button>
         </form>
