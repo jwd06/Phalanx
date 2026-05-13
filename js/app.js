@@ -129,7 +129,7 @@ document.getElementById('macro-custom').addEventListener('click', () =>
 // Slider interdependency — keep protein + carbs + fat = 100, clamped to AMDR bounds
 const onSliderChange = (changed, newVal) =>
 {
-    const [a, b] = ['protein', 'carbs', 'fat'].filter(k => k !== changed)
+    const [a, b] = ['protein', 'carbs', 'fat'].filter(k => k !== changed) //removes changed macros, two remains
     const remaining = 100 - newVal
     const oldSum = macroPct[a] + macroPct[b]
 
