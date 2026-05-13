@@ -62,6 +62,17 @@ function renderMacros(goalCalories) {
     const fat_min     = Math.round(goalCalories * 0.20 / 9)
     const fat_max     = Math.round(goalCalories * 0.35 / 9)
 
+    // Micronutrients — scaled to goal calories
+    const sodium_mg = Math.min(Math.round(goalCalories), 2300)      // ~1mg/kcal, USDA cap 2300mg
+    const sugar_g   = Math.round(goalCalories * 0.075 / 4)          // WHO: ~7.5% of energy as free sugars
+    const fibre_g   = Math.round(goalCalories * 14 / 1000)          // DGA 2020-2025: 14g/1000kcal
+
+    const sodium_min = 1500;  const sodium_max = 2300               // USDA bounds (mg)
+    const sugar_min  = Math.round(goalCalories * 0.05 / 4)
+    const sugar_max  = Math.round(goalCalories * 0.10 / 4)
+    const fibre_min  = Math.round(goalCalories * 11.5 / 1000)
+    const fibre_max  = Math.round(goalCalories * 16.5 / 1000)
+
     // Reveal mode selector and align slider bounds to AMDR % ranges
     document.getElementById('mac-mode-selector').style.display = 'block'
     const proteinSlider = document.getElementById('proteins-slider')
@@ -82,21 +93,42 @@ function renderMacros(goalCalories) {
                 <td class="macro-label">Protein</td>
                 <td class="macro-value">
                     <strong>${protein_g} grams/day</strong>
-                    <span class="macro-range">Range: ${protein_min} - ${protein_max}</span>
+                    <span class="macro-range">Range: ${protein_min} – ${protein_max} g</span>
                 </td>
             </tr>
             <tr>
                 <td class="macro-label">Carbs</td>
                 <td class="macro-value">
                     <strong>${carbs_g} grams/day</strong>
-                    <span class="macro-range">Range: ${carbs_min} - ${carbs_max}</span>
+                    <span class="macro-range">Range: ${carbs_min} – ${carbs_max} g</span>
                 </td>
             </tr>
             <tr>
                 <td class="macro-label">Fat</td>
                 <td class="macro-value">
                     <strong>${fat_g} grams/day</strong>
-                    <span class="macro-range">Range: ${fat_min} - ${fat_max}</span>
+                    <span class="macro-range">Range: ${fat_min} – ${fat_max} g</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="macro-label">Sodium</td>
+                <td class="macro-value">
+                    <strong>${sodium_mg} mg/day</strong>
+                    <span class="macro-range">Range: ${sodium_min} – ${sodium_max} mg</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="macro-label">Sugar</td>
+                <td class="macro-value">
+                    <strong>${sugar_g} grams/day</strong>
+                    <span class="macro-range">Range: ${sugar_min} – ${sugar_max} g</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="macro-label">Fibre</td>
+                <td class="macro-value">
+                    <strong>${fibre_g} grams/day</strong>
+                    <span class="macro-range">Range: ${fibre_min} – ${fibre_max} g</span>
                 </td>
             </tr>
         </table>
@@ -217,4 +249,3 @@ const calorieGoal = (tdee, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalori
             return tdee
     }
 }
- 
