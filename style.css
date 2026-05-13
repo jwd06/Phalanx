@@ -166,3 +166,14 @@
     color: #777;
 }
 
+@media (max-width: 480px) {
+    .macro-table td {
+        padding: 6px 8px;
+        font-size: 0.9em;
+    }
+
+    .macro-label {
+        width: 40%;
+    }
+}
+
