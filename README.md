@@ -1,2 +1,2 @@
 # Phalanx
-Prac for js, but mainly a bmr and calorie calculator, new features will come soon (workout split and nutrition facts)
+Prac for js, but mainly a bmr and calorie calculator, new features will come soon (workout split and nutrition facts) 
