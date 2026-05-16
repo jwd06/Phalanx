@@ -1,4 +1,5 @@
-import calculate, { refreshMacros } from './calculator.js'
+import calculate, { refreshMacros, redistributeCustomMacros } from './calculator.js'
+import renderSchedule from './workout.js'
 
 export let currentUnit = 'metric'
 export const macroPct = { protein: 30, carbs: 50, fat: 20 }
@@ -80,10 +81,11 @@ document.getElementById('goal').addEventListener('change', (e) =>
 
 // Macro mode switcher
 const sliderIds   = { protein: 'proteins-slider', carbs: 'carbohydrates-slider', fat: 'fats-slider' }
-const pctIds      = { protein: 'protein-pct',     carbs: 'carbs-pct',            fat: 'fats-pct'    }
-const MACRO_BOUNDS = { protein: { min: 10, max: 35 }, carbs: { min: 45, max: 65 }, fat: { min: 20, max: 35 } }
-const clamp = (key, val) => Math.min(MACRO_BOUNDS[key].max, Math.max(MACRO_BOUNDS[key].min, val))
+// const pctIds   = { protein: 'protein-pct', carbs: 'carbs-pct', fat: 'fats-pct' }  // old AMDR % label IDs
+//const MACRO_BOUNDS = { protein: { min: 10, max: 35 }, carbs: { min: 45, max: 65 }, fat: { min: 20, max: 35 } }
+// const clamp = (key, val) => Math.min(MACRO_BOUNDS[key].max, Math.max(MACRO_BOUNDS[key].min, val))
 
+/*
 const setTrackFill = (slider) =>
 {
     const min = parseFloat(slider.min)
@@ -109,13 +111,13 @@ const resetToBalanced = () =>
     macroPct.fat     = 20
     updateSliderUI()
 }
+*/
 
 document.getElementById('macro-balanced').addEventListener('click', () =>
 {
     document.getElementById('macro-balanced').classList.add('active-macro')
     document.getElementById('macro-custom').classList.remove('active-macro')
     document.getElementById('macro-slider-selection').style.display = 'none'
-    resetToBalanced()
     refreshMacros()
 })
 
@@ -124,8 +126,10 @@ document.getElementById('macro-custom').addEventListener('click', () =>
     document.getElementById('macro-custom').classList.add('active-macro')
     document.getElementById('macro-balanced').classList.remove('active-macro')
     document.getElementById('macro-slider-selection').style.display = 'block'
+    refreshMacros()
 })
 
+/*
 // Slider interdependency — keep protein + carbs + fat = 100, clamped to AMDR bounds
 const onSliderChange = (changed, newVal) =>
 {
@@ -155,6 +159,46 @@ for (const [key, sliderId] of Object.entries(sliderIds)) {
         onSliderChange(key, parseInt(e.target.value))
     })
 }
+*/
+
+/*
+// Old: simple refreshMacros call on every slider input
+for (const sliderId of Object.values(sliderIds)) {
+    document.getElementById(sliderId).addEventListener('input', () => refreshMacros())
+}
+*/
+
+// Custom mode: redistribute proportionally to keep total = goal calories
+// Balanced mode: sliders hidden, no action needed
+for (const [key, sliderId] of Object.entries(sliderIds)) {
+    document.getElementById(sliderId).addEventListener('input', (e) => {
+        const isCustom = document.getElementById('macro-custom').classList.contains('active-macro')
+        if (isCustom) redistributeCustomMacros(key, parseInt(e.target.value))
+        else refreshMacros()
+    })
+}
+
+document.getElementById('split-type').addEventListener('change', (e) =>{
+    const isCustom = e.target.value === 'custom'
+    document.getElementById('custom-split').style.display = isCustom ? 'block' : 'none'
+    document.getElementById('start-day-wrapper').style.display = isCustom ? 'none' : 'block'
+})
+
+
 
 // Calculate button
 document.getElementById('calculate-button').addEventListener('click', calculate)
+
+//Genrate Split
+document.getElementById('generate-split').addEventListener('click', () =>{
+    
+    const splitType = document.getElementById('split-type').value
+    const startDay = parseInt(document.getElementById('start-day').value)
+
+    if(splitType === 'custom'){
+        const selects = document.querySelectorAll('.custom-day-select')
+        const customDays = Array.from(selects).map(s => s.value)
+        renderSchedule('custom', startDay, customDays)
+    }
+    else renderSchedule(splitType, startDay)
+})
