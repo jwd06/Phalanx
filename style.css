@@ -177,3 +177,36 @@
     }
 }
 
+.split-grid {
+     display: grid;
+     grid-template-columns: repeat(7, 1fr);
+     gap: 6px;
+     margin-top: 14px;
+ }
+
+ .split-cell {
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     padding: 8px 4px;
+     text-align: center;
+ }
+
+ .split-day {
+     font-size: 0.75em;
+     color: #666;
+     margin-bottom: 4px;
+ }
+
+ .split-label {
+     font-weight: 500;
+     font-size: 0.85em;
+ }
+
+ .split-workout { background-color: #b9e5bdca; }
+ .split-rest    { background-color: #f5f5f5; color: #828080; }
+
+ @media (max-width: 480px) {
+     .split-grid { grid-template-columns: repeat(4, 1fr); }
+     .split-label { font-size: 0.78em; }
+ }
+
