@@ -114,15 +114,15 @@
             <div id="macro-slider-selection" style="display: none;">
                 <p class="slider-hint">Slide the bars to create your own plan</p>
                 <div class="slider-row">
-                    <label>Protein: <span id="protein-pct">30</span>%</label>
+                    <label>Protein: <span id="protein-val">–</span></label>
                     <input type="range" min="5" max="90" value="30" class="slider" id="proteins-slider">
                 </div>
                 <div class="slider-row">
-                    <label>Carbs: <span id="carbs-pct">50</span>%</label>
+                    <label>Carbs: <span id="carbs-val">–</span></label>
                     <input type="range" min="5" max="90" value="50" class="slider" id="carbohydrates-slider">
                 </div>
                 <div class="slider-row">
-                    <label>Fats: <span id="fats-pct">20</span>%</label>
+                    <label>Fats: <span id="fats-val">–</span></label>
                     <input type="range" min="5" max="90" value="20" class="slider" id="fats-slider">
                 </div>
             </div>
@@ -138,7 +138,117 @@
     </div>
 
     <div id="workout-split" class="section" style="display:none">
-        <p>Workout Split — coming soon</p>
+        <h3>Workout Split Builder</h3>
+        <h5>Choose a split or create your custom one</h5>
+        <br>
+
+        <form id="split-form">
+            <label for="split-type">Split Type: </label>
+            <select id="split-type">
+                <option value="ppl">Push/Pull/Legs</option>
+                <option value="upper-lower">Upper-Lower</option>
+                <option value="full-body">Full Body</option>
+                <option value="custom">Custom</option>
+            </select><br><br>
+
+            <div id="start-day-wrapper">
+                <label for="start-day">Start Day: </label>
+                <select id="start-day">
+                    <option value="0">Monday</option>
+                    <option value="1">Tuesday</option>
+                    <option value="2">Wednesday</option>
+                    <option value="3">Thursday</option>
+                    <option value="4">Friday</option>
+                    <option value="5">Saturday</option>
+                    <option value="6">Sunday</option>
+                </select><br><br>
+            </div>
+
+            
+        </form>
+
+        <div id="custom-split" style="display: none;">
+            <p style="font-size: 0.9em; color:#555;">Assign each day</p>
+            <!--Repeat for Mon-Sun-->
+            <label>Mon:
+                <select class="custom-day-select">
+                    <option>Push</option><option>Pull</option><option>Legs</option>
+                    <option>Upper</option><option>Lower</option>
+                    <option>Full Body</option><option>Chest</option>
+                    <option>Back</option><option>Shoulders</option>
+                    <option>Arms</option><option>Rest</option>
+                </select>
+            </label><br><br>
+
+            <label>Tue:
+                <select class="custom-day-select">
+                    <option>Push</option><option>Pull</option><option>Legs</option>
+                    <option>Upper</option><option>Lower</option>
+                    <option>Full Body</option><option>Chest</option>
+                    <option>Back</option><option>Shoulders</option>
+                    <option>Arms</option><option>Rest</option>
+                </select>
+            </label><br><br>
+
+            <label>Wed:
+                <select class="custom-day-select">
+                    <option>Push</option><option>Pull</option><option>Legs</option>
+                    <option>Upper</option><option>Lower</option>
+                    <option>Full Body</option><option>Chest</option>
+                    <option>Back</option><option>Shoulders</option>
+                    <option>Arms</option><option>Rest</option>
+                </select>
+            </label><br><br>
+
+            <label>Thur:
+                <select class="custom-day-select">
+                    <option>Push</option><option>Pull</option><option>Legs</option>
+                    <option>Upper</option><option>Lower</option>
+                    <option>Full Body</option><option>Chest</option>
+                    <option>Back</option><option>Shoulders</option>
+                    <option>Arms</option><option>Rest</option>
+                </select>
+            </label><br><br>
+
+            <label>Fri:
+                <select class="custom-day-select">
+                    <option>Push</option><option>Pull</option><option>Legs</option>
+                    <option>Upper</option><option>Lower</option>
+                    <option>Full Body</option><option>Chest</option>
+                    <option>Back</option><option>Shoulders</option>
+                    <option>Arms</option><option>Rest</option>
+                </select>
+            </label><br><br>
+
+            <label>Sat:
+                <select class="custom-day-select">
+                    <option>Push</option><option>Pull</option><option>Legs</option>
+                    <option>Upper</option><option>Lower</option>
+                    <option>Full Body</option><option>Chest</option>
+                    <option>Back</option><option>Shoulders</option>
+                    <option>Arms</option><option>Rest</option>
+                </select>
+            </label><br><br>
+
+            <label>Sun:
+                <select class="custom-day-select">
+                    <option>Push</option><option>Pull</option><option>Legs</option>
+                    <option>Upper</option><option>Lower</option>
+                    <option>Full Body</option><option>Chest</option>
+                    <option>Back</option><option>Shoulders</option>
+                    <option>Arms</option><option>Rest</option>
+                </select>
+            </label><br><br>
+        </div>
+
+        <button type="button" id="generate-split">Generate Schedule</button><br><br>
+
+        <div id="split-result"></div><br><br>
+        <div id="download-button" style="display: none;">
+            <button type="button" id="import-schedule">Import Schedule</button>
+            <p>Download the schedule and add it to you calender</p>
+        </div>
+        
     </div>
 
     <div id="food-nutrition" class="section" style="display:none">
