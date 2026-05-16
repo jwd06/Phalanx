@@ -1,6 +1,7 @@
 import { currentUnit, macroPct } from './app.js'
 
 let lastGoalCalories = null
+let lastWeight = null
 
 // Gathering all the fields from the HTML file
 export default function calculate() {
@@ -10,11 +11,13 @@ export default function calculate() {
     let inputWeight, inputHeight
     if (currentUnit === 'us') {
         inputWeight = parseFloat(document.getElementById("weight").value) * 0.453592
+        lastWeight = inputWeight
         const ft = parseFloat(document.getElementById("height-ft").value) || 0
         const inches = parseFloat(document.getElementById("height-in").value) || 0
         inputHeight = (ft * 30.48) + (inches * 2.54)
     } else {
         inputWeight = parseFloat(document.getElementById("weight").value)
+        lastWeight = inputWeight
         inputHeight = parseFloat(document.getElementById("height").value)
     }
     const dropDownActivityLevel = document.getElementById("activity-level").value
@@ -42,18 +45,212 @@ export default function calculate() {
     `
 
     lastGoalCalories = goalCalories
-    renderMacros(goalCalories)
+    renderMacros(goalCalories, lastWeight)
 }
 
 export function refreshMacros() {
-    if (lastGoalCalories !== null) renderMacros(lastGoalCalories)
+    if (lastGoalCalories !== null){
+        renderMacros(lastGoalCalories, lastWeight)
+    }
 }
 
-function renderMacros(goalCalories) {
+// Redistributes remaining kcal proportionally between the other two macros when
+// a custom slider changes, keeping total kcal = lastGoalCalories.
+export function redistributeCustomMacros(changedMacro, newVal_g) {
+    if (lastGoalCalories === null) return
+
+    //calories per gram of each macro nutrients 
+    const kcalPerG = { protein: 4, carbs: 4, fat: 9 }
+    //stores the entire HTML element, can get value anytime
+    const sliders = {
+        protein: document.getElementById('proteins-slider'),
+        carbs:   document.getElementById('carbohydrates-slider'),
+        fat:     document.getElementById('fats-slider')
+    }
+
+    //stores the two unchanged macros using filter method
+    const [a, b] = ['protein', 'carbs', 'fat'].filter(k => k !== changedMacro)
+
+    //stores the calories for the changed macro nutrients
+    const changed_kcal   = newVal_g * kcalPerG[changedMacro]
+
+    //subtracts the changed macro nutrients calories from the goal calorie to find remaining
+    const remaining_kcal = lastGoalCalories - changed_kcal
+
+
+    //gets the grams of the two unchanged macros and converts to kcals
+    const old_a_kcal = parseInt(sliders[a].value) * kcalPerG[a]
+    const old_b_kcal = parseInt(sliders[b].value) * kcalPerG[b]
+
+    //sums up the two unchanged macro kcals
+    const old_sum = old_a_kcal + old_b_kcal
+
+    let new_a_g
+    //if the sum is 0, divide equally between 2 macros
+    //otherwise, (remaining_kcal * old_a_kcal)/old sum calculates the calories for one of the 
+    //unchanged macros, 
+    //then divide by the calorie density to find the gram of one of the unchanged macro
+    if (old_sum === 0) {
+        new_a_g = Math.round((remaining_kcal / 2) / kcalPerG[a])
+    } 
+    else {
+        new_a_g = Math.round((remaining_kcal * old_a_kcal / old_sum) / kcalPerG[a])
+    }
+
+    // Clamp a, then derive b from the remainder
+    new_a_g = Math.max(parseInt(sliders[a].min), Math.min(parseInt(sliders[a].max), new_a_g))
+    let new_b_g = Math.round((remaining_kcal - new_a_g * kcalPerG[a]) / kcalPerG[b])
+    new_b_g = Math.max(parseInt(sliders[b].min), Math.min(parseInt(sliders[b].max), new_b_g))
+
+
+    //update ui value inside the html
+    sliders[changedMacro].value = newVal_g
+    sliders[a].value = new_a_g
+    sliders[b].value = new_b_g
+
+    //display the refreshed values to the user
+    refreshMacros()
+}
+
+const clampSlider = (s) =>
+    Math.max(parseInt(s.min), Math.min(parseInt(s.max), parseInt(s.value) || parseInt(s.min)))
+
+function renderMacros(goalCalories, inputWeight) {
+    const isCustom = document.getElementById('macro-custom').classList.contains('active-macro')
+
+    document.getElementById('mac-mode-selector').style.display = 'block'
+    const proteinSlider = document.getElementById('proteins-slider')
+    const carbsSlider = document.getElementById('carbohydrates-slider')
+    const fatSlider = document.getElementById('fats-slider')
+
+    let protein_g, carbs_g, fat_g
+    let protein_range, carbs_range, fat_range
+
+    if (isCustom) {
+        // Protein: g/kg bodyweight bounds
+        const proteinMin = Math.round(1.0 * inputWeight)
+        const proteinMax = Math.round(2.4 * inputWeight)
+        proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
+
+        // Fat: % of goal calories
+        const fatMin = Math.round(goalCalories * 0.15 / 9)
+        const fatMax = Math.round(goalCalories * 0.35 / 9)
+        fatSlider.min = fatMin;  fatSlider.max = fatMax
+
+        // Carbs: % of goal calories
+        const carbsMin = Math.round(goalCalories * 0.20 / 4)
+        const carbsMax = Math.round(goalCalories * 0.65 / 4)
+        carbsSlider.min = carbsMin;  carbsSlider.max = carbsMax
+
+        // Clamp current values into bounds (in case of mode switch)
+        proteinSlider.value = clampSlider(proteinSlider)
+        fatSlider.value     = clampSlider(fatSlider)
+        carbsSlider.value   = clampSlider(carbsSlider)
+
+        // Enable all three sliders
+        proteinSlider.disabled = false
+        carbsSlider.disabled   = false
+        fatSlider.disabled     = false
+
+        // Read gram values
+        protein_g = parseInt(proteinSlider.value)
+        carbs_g   = parseInt(carbsSlider.value)
+        fat_g     = parseInt(fatSlider.value)
+
+        // Range column shows slider bounds
+        protein_range = `${proteinMin} – ${proteinMax} g`
+        carbs_range   = `${carbsMin} – ${carbsMax} g`
+        fat_range     = `${fatMin} – ${fatMax} g`
+
+        for (const slider of [proteinSlider, carbsSlider, fatSlider]) {
+            const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100
+            slider.style.background = `linear-gradient(to right, #1a73e8 ${pct}%, #d3d3d3 ${pct}%)`
+        }
+
+    } else {
+        // Balanced mode — fixed percentage formulas (no bodyweight, no sliders)
+        protein_g = Math.round(goalCalories * 0.236 / 4)
+        carbs_g   = Math.round(goalCalories * 0.517 / 4)
+        fat_g     = Math.round(goalCalories * 0.247 / 9)
+
+        proteinSlider.disabled = true
+        carbsSlider.disabled   = true
+        fatSlider.disabled     = true
+
+        // Range column shows lower – upper bound in grams (same bounds as custom mode)
+        const proteinLow  = Math.round(1.0 * inputWeight)
+        const proteinHigh = Math.round(2.4 * inputWeight)
+        const fatLow      = Math.round(goalCalories * 0.15 / 9)
+        const fatHigh     = Math.round(goalCalories * 0.35 / 9)
+        const carbsLow    = Math.round(goalCalories * 0.20 / 4)
+        const carbsHigh   = Math.round(goalCalories * 0.65 / 4)
+
+        protein_range = `${proteinLow} – ${proteinHigh} g`
+        carbs_range   = `${carbsLow} – ${carbsHigh} g`
+        fat_range     = `${fatLow} – ${fatHigh} g`
+
+        /*
+        // Old balanced mode — g/bodyweight approach
+        const proteinMin = Math.round(1.2 * inputWeight)
+        const proteinMax = Math.round(1.6 * inputWeight)
+        const fatMin = Math.round(goalCalories * 0.20 / 9)
+        const fatMax = Math.round(goalCalories * 0.25 / 9)
+
+        proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
+        fatSlider.min = fatMin;  fatSlider.max = fatMax
+
+        proteinSlider.value = clampSlider(proteinSlider)
+        fatSlider.value     = clampSlider(fatSlider)
+
+        const protein_g = parseInt(proteinSlider.value)
+        const fat_g     = parseInt(fatSlider.value)
+
+        carbs_g = Math.round((goalCalories - protein_g * 4 - fat_g * 9) / 4)
+        carbsSlider.value    = carbs_g
+        carbsSlider.disabled = true
+
+        carbs_min = Math.round((goalCalories - proteinMax * 4 - fatMax * 9) / 4)
+        carbs_max = Math.round((goalCalories - proteinMin * 4 - fatMin * 9) / 4)
+        */
+    }
+
+    /*
+    // Old g/bodyweight shared bounds (before if/else split)
+    const proteinMin = Math.round(1.2 * inputWeight)
+    const proteinMax = Math.round(1.6 * inputWeight)
+    const fatMin = Math.round(goalCalories * ((isCustom) ? 0.15 : 0.20) / 9)
+    const fatMax = Math.round(goalCalories * ((isCustom) ? 0.35 : 0.25) / 9)
+
+    proteinSlider.min = isCustom ? Math.round(1.0 * inputWeight) : proteinMin
+    proteinSlider.max = isCustom ? Math.round(2.4 * inputWeight) : proteinMax
+    fatSlider.min = fatMin
+    fatSlider.max = fatMax
+
+    // Old AMDR % hard bounds
+    // proteinSlider.min = 10;  proteinSlider.max = 35
+    // carbsSlider.min   = 45;  carbsSlider.max   = 65
+    // fatSlider.min     = 20;  fatSlider.max     = 35
+
+    proteinSlider.value = Math.max(proteinSlider.min, Math.min(proteinSlider.max, parseInt(proteinSlider.value) || proteinSlider.min))
+    fatSlider.value = Math.max(fatSlider.min, Math.min(fatSlider.max, parseInt(fatSlider.value) || fatSlider.min))
+
+    const protein_g = parseInt(proteinSlider.value)
+    const fat_g = parseInt(fatSlider.value)
+    */
+
+    /*
+    // Old AMDR % calculation
     const protein_g = Math.round((goalCalories * macroPct.protein / 100) / 4)
     const carbs_g   = Math.round((goalCalories * macroPct.carbs   / 100) / 4)
     const fat_g     = Math.round((goalCalories * macroPct.fat     / 100) / 9)
+    */
 
+    // Update slider label spans
+    document.getElementById('protein-val').textContent = protein_g + ' g'
+    document.getElementById('carbs-val').textContent   = carbs_g   + ' g'
+    document.getElementById('fats-val').textContent    = fat_g     + ' g'
+
+    /*
     // AMDR (Acceptable Macronutrient Distribution Ranges) from dietary guidelines
     const protein_min = Math.round(goalCalories * 0.10 / 4)
     const protein_max = Math.round(goalCalories * 0.35 / 4)
@@ -61,6 +258,7 @@ function renderMacros(goalCalories) {
     const carbs_max   = Math.round(goalCalories * 0.65 / 4)
     const fat_min     = Math.round(goalCalories * 0.20 / 9)
     const fat_max     = Math.round(goalCalories * 0.35 / 9)
+    */
 
     // Micronutrients — scaled to goal calories
     const sodium_mg = Math.min(Math.round(goalCalories), 2300)      // ~1mg/kcal, USDA cap 2300mg
@@ -73,41 +271,27 @@ function renderMacros(goalCalories) {
     const fibre_min  = Math.round(goalCalories * 11.5 / 1000)
     const fibre_max  = Math.round(goalCalories * 16.5 / 1000)
 
-    // Reveal mode selector and align slider bounds to AMDR % ranges
-    document.getElementById('mac-mode-selector').style.display = 'block'
-    const proteinSlider = document.getElementById('proteins-slider')
-    const carbsSlider   = document.getElementById('carbohydrates-slider')
-    const fatSlider     = document.getElementById('fats-slider')
-    proteinSlider.min = 10;  proteinSlider.max = 35
-    carbsSlider.min   = 45;  carbsSlider.max   = 65
-    fatSlider.min     = 20;  fatSlider.max     = 35
-
-    for (const slider of [proteinSlider, carbsSlider, fatSlider]) {
-        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100
-        slider.style.background = `linear-gradient(to right, #1a73e8 ${pct}%, #d3d3d3 ${pct}%)`
-    }
-
     document.getElementById('macro-result').innerHTML = `
         <table class="macro-table">
             <tr>
                 <td class="macro-label">Protein</td>
                 <td class="macro-value">
                     <strong>${protein_g} grams/day</strong>
-                    <span class="macro-range">Range: ${protein_min} – ${protein_max} g</span>
+                    <span class="macro-range">Range: ${protein_range}</span>
                 </td>
             </tr>
             <tr>
                 <td class="macro-label">Carbs</td>
                 <td class="macro-value">
                     <strong>${carbs_g} grams/day</strong>
-                    <span class="macro-range">Range: ${carbs_min} – ${carbs_max} g</span>
+                    <span class="macro-range">Range: ${carbs_range}</span>
                 </td>
             </tr>
             <tr>
                 <td class="macro-label">Fat</td>
                 <td class="macro-value">
                     <strong>${fat_g} grams/day</strong>
-                    <span class="macro-range">Range: ${fat_min} – ${fat_max} g</span>
+                    <span class="macro-range">Range: ${fat_range}</span>
                 </td>
             </tr>
             <tr>
