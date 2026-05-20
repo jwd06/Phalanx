@@ -1,4 +1,5 @@
 import { currentUnit, macroPct } from './app.js'
+import { validationInputs } from './validator.js'
 
 let lastGoalCalories = null
 let lastWeight = null
@@ -12,9 +13,19 @@ export default function calculate() {
     if (currentUnit === 'us') {
         inputWeight = parseFloat(document.getElementById("weight").value) * 0.453592
         lastWeight = inputWeight
-        const ft = parseFloat(document.getElementById("height-ft").value) || 0
-        const inches = parseFloat(document.getElementById("height-in").value) || 0
-        inputHeight = (ft * 30.48) + (inches * 2.54)
+        const ftValSt = document.getElementById("height-ft").value
+        const inchesValSt = document.getElementById("height-in").value
+
+        if (ftValSt === "" && inchesValSt === ""){
+            inputHeight = NaN
+        }
+        else{
+            const ft = parseFloat(ftValSt) || 0
+            const inches = parseFloat(inchesValSt) || 0
+            inputHeight = (ft * 30.48) + (inches * 2.54)
+        }
+
+
     } else {
         inputWeight = parseFloat(document.getElementById("weight").value)
         lastWeight = inputWeight
@@ -24,8 +35,9 @@ export default function calculate() {
     const dropDownGoal = document.getElementById("goal").value
     const dropDownCalorieOffsetWL = document.getElementById("calorie-offset-wl").value
     const dropDownCalorieOffsetGL = document.getElementById("calorie-offset-wg").value
+    const customOffset = parseFloat(document.getElementById("custom-offset-input").value) || 0
 
-    const error = validationInputs(inputAge, inputWeight, inputHeight)
+    const error = validationInputs(inputAge, inputWeight, inputHeight, currentUnit)
     if (error){
         const errorMsg = document.getElementById("results")
         errorMsg.innerHTML = `<p style="color:red">${error}</p>`
@@ -34,12 +46,25 @@ export default function calculate() {
     }
 
     const bmiResult = bmi(inputWeight, inputHeight)
+    const bmrResult = dropDownGender === 'female'
+        ? bmrWOMEN(inputWeight, inputHeight, inputAge)
+        : bmrMEN(inputWeight, inputHeight, inputAge)
     const tdeeResult = tdee(inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivityLevel)
-    const goalCalories = calorieGoal(tdeeResult, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalorieOffsetGL)
+    let goalCalories = calorieGoal(tdeeResult, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalorieOffsetGL, customOffset)
     const bmiRangeRes = bmiRange(inputWeight, inputHeight)
+
+    if (goalCalories < bmrResult) {
+        document.getElementById("results").innerHTML =
+            `<p style="color:red">Warning: your selected plan would put you below your BMR. Please consult a health professional or choose a less aggressive plan.</p>`
+        document.getElementById("macro-result").innerHTML = ''
+        document.getElementById('mac-mode-selector').style.display = 'none'
+        lastGoalCalories = null
+        return
+    }
 
     document.getElementById("results").innerHTML = `
         <p>BMI: ${bmiResult.toFixed(2)} Range: ${bmiRangeRes}</p>
+        <p>BMR: ${bmrResult.toFixed(0)} kcal/day</p>
         <p>TDEE: ${tdeeResult.toFixed(0)} kcal/day</p>
         <p>Goal Calories: ${goalCalories.toFixed(0)} kcal/day</p>
     `
@@ -59,7 +84,7 @@ export function refreshMacros() {
 export function redistributeCustomMacros(changedMacro, newVal_g) {
     if (lastGoalCalories === null) return
 
-    //calories per gram of each macro nutrients 
+    //calories per gram of each macro nutrients
     const kcalPerG = { protein: 4, carbs: 4, fat: 9 }
     //stores the entire HTML element, can get value anytime
     const sliders = {
@@ -87,12 +112,12 @@ export function redistributeCustomMacros(changedMacro, newVal_g) {
 
     let new_a_g
     //if the sum is 0, divide equally between 2 macros
-    //otherwise, (remaining_kcal * old_a_kcal)/old sum calculates the calories for one of the 
-    //unchanged macros, 
+    //otherwise, (remaining_kcal * old_a_kcal)/old sum calculates the calories for one of the
+    //unchanged macros,
     //then divide by the calorie density to find the gram of one of the unchanged macro
     if (old_sum === 0) {
         new_a_g = Math.round((remaining_kcal / 2) / kcalPerG[a])
-    } 
+    }
     else {
         new_a_g = Math.round((remaining_kcal * old_a_kcal / old_sum) / kcalPerG[a])
     }
@@ -102,6 +127,17 @@ export function redistributeCustomMacros(changedMacro, newVal_g) {
     let new_b_g = Math.round((remaining_kcal - new_a_g * kcalPerG[a]) / kcalPerG[b])
     new_b_g = Math.max(parseInt(sliders[b].min), Math.min(parseInt(sliders[b].max), new_b_g))
 
+
+
+
+    const finalTotal = (newVal_g * kcalPerG[changedMacro]) + (new_a_g * kcalPerG[a]) + (new_b_g * kcalPerG[b])
+    const diff = lastGoalCalories - finalTotal
+
+    //If we're off by more than a few calories abjust the 'b' macro to absorb the remainder
+    //as best as possible
+    if (Math.abs(diff) > 5){
+        new_b_g += Math.round(diff/kcalPerG[b])
+    }
 
     //update ui value inside the html
     sliders[changedMacro].value = newVal_g
@@ -188,77 +224,12 @@ function renderMacros(goalCalories, inputWeight) {
         protein_range = `${proteinLow} – ${proteinHigh} g`
         carbs_range   = `${carbsLow} – ${carbsHigh} g`
         fat_range     = `${fatLow} – ${fatHigh} g`
-
-        /*
-        // Old balanced mode — g/bodyweight approach
-        const proteinMin = Math.round(1.2 * inputWeight)
-        const proteinMax = Math.round(1.6 * inputWeight)
-        const fatMin = Math.round(goalCalories * 0.20 / 9)
-        const fatMax = Math.round(goalCalories * 0.25 / 9)
-
-        proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
-        fatSlider.min = fatMin;  fatSlider.max = fatMax
-
-        proteinSlider.value = clampSlider(proteinSlider)
-        fatSlider.value     = clampSlider(fatSlider)
-
-        const protein_g = parseInt(proteinSlider.value)
-        const fat_g     = parseInt(fatSlider.value)
-
-        carbs_g = Math.round((goalCalories - protein_g * 4 - fat_g * 9) / 4)
-        carbsSlider.value    = carbs_g
-        carbsSlider.disabled = true
-
-        carbs_min = Math.round((goalCalories - proteinMax * 4 - fatMax * 9) / 4)
-        carbs_max = Math.round((goalCalories - proteinMin * 4 - fatMin * 9) / 4)
-        */
     }
-
-    /*
-    // Old g/bodyweight shared bounds (before if/else split)
-    const proteinMin = Math.round(1.2 * inputWeight)
-    const proteinMax = Math.round(1.6 * inputWeight)
-    const fatMin = Math.round(goalCalories * ((isCustom) ? 0.15 : 0.20) / 9)
-    const fatMax = Math.round(goalCalories * ((isCustom) ? 0.35 : 0.25) / 9)
-
-    proteinSlider.min = isCustom ? Math.round(1.0 * inputWeight) : proteinMin
-    proteinSlider.max = isCustom ? Math.round(2.4 * inputWeight) : proteinMax
-    fatSlider.min = fatMin
-    fatSlider.max = fatMax
-
-    // Old AMDR % hard bounds
-    // proteinSlider.min = 10;  proteinSlider.max = 35
-    // carbsSlider.min   = 45;  carbsSlider.max   = 65
-    // fatSlider.min     = 20;  fatSlider.max     = 35
-
-    proteinSlider.value = Math.max(proteinSlider.min, Math.min(proteinSlider.max, parseInt(proteinSlider.value) || proteinSlider.min))
-    fatSlider.value = Math.max(fatSlider.min, Math.min(fatSlider.max, parseInt(fatSlider.value) || fatSlider.min))
-
-    const protein_g = parseInt(proteinSlider.value)
-    const fat_g = parseInt(fatSlider.value)
-    */
-
-    /*
-    // Old AMDR % calculation
-    const protein_g = Math.round((goalCalories * macroPct.protein / 100) / 4)
-    const carbs_g   = Math.round((goalCalories * macroPct.carbs   / 100) / 4)
-    const fat_g     = Math.round((goalCalories * macroPct.fat     / 100) / 9)
-    */
 
     // Update slider label spans
     document.getElementById('protein-val').textContent = protein_g + ' g'
     document.getElementById('carbs-val').textContent   = carbs_g   + ' g'
     document.getElementById('fats-val').textContent    = fat_g     + ' g'
-
-    /*
-    // AMDR (Acceptable Macronutrient Distribution Ranges) from dietary guidelines
-    const protein_min = Math.round(goalCalories * 0.10 / 4)
-    const protein_max = Math.round(goalCalories * 0.35 / 4)
-    const carbs_min   = Math.round(goalCalories * 0.45 / 4)
-    const carbs_max   = Math.round(goalCalories * 0.65 / 4)
-    const fat_min     = Math.round(goalCalories * 0.20 / 9)
-    const fat_max     = Math.round(goalCalories * 0.35 / 9)
-    */
 
     // Micronutrients — scaled to goal calories
     const sodium_mg = Math.min(Math.round(goalCalories), 2300)      // ~1mg/kcal, USDA cap 2300mg
@@ -406,7 +377,7 @@ const tdee = (inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivi
  * For maintenance: Calorie Goal = TDEE
  */
 
-const calorieGoal = (tdee, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalorieOffsetGL) =>
+const calorieGoal = (tdee, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalorieOffsetGL, customOffset) =>
 {
     switch (dropDownGoal) {
         case "lose-weight":
@@ -415,6 +386,8 @@ const calorieGoal = (tdee, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalori
                     return tdee - 250
                 case "extreme":
                     return tdee - 1000
+                case "custom-offset":
+                    return tdee - customOffset
                 default:
                     return tdee - 500
             }
@@ -425,6 +398,8 @@ const calorieGoal = (tdee, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalori
                     return tdee + 250
                 case "extreme":
                     return tdee + 1000
+                case "custom-offset":
+                    return tdee + customOffset
                 default:
                     return tdee + 500
             }
