@@ -1,5 +1,5 @@
 import calculate, { refreshMacros, redistributeCustomMacros } from './calculator.js'
-import renderSchedule from './workout.js'
+import renderSchedule, { generateICS } from './workout.js'
 
 export let currentUnit = 'metric'
 export const macroPct = { protein: 30, carbs: 50, fat: 20 }
@@ -64,6 +64,22 @@ const showWeightGainOffset = () =>
     document.getElementById('calorie-offset-weight-gain').style.display = 'block'
 }
 
+//custom offset picker
+const toggleCustomOffset = (e) =>
+{
+    if (e.target.value === 'custom-offset'){
+        document.getElementById("custom-offset-picker").style.display = 'block'
+    }
+    else{
+        document.getElementById("custom-offset-picker").style.display = 'none'
+    }
+}
+
+//listener for custom offset 
+document.getElementById("calorie-offset-wl").addEventListener('change', toggleCustomOffset)
+document.getElementById("calorie-offset-wg").addEventListener('change', toggleCustomOffset)
+
+
 //Event Listener for Unit switcher
 document.getElementById('unit-metric').addEventListener('click', switchToMetric)
 document.getElementById('unit-us').addEventListener('click', switchToUS)
@@ -71,6 +87,8 @@ document.getElementById('unit-us').addEventListener('click', switchToUS)
 //Event listener for Calorie Offset
 document.getElementById('goal').addEventListener('change', (e) =>
 {
+    document.getElementById("custom-offset-picker").style.display = 'none'
+
     if (e.target.value === 'lose-weight') showWeightLossOffset()
     else if (e.target.value === 'gain-weight') showWeightGainOffset()
     else {
@@ -182,6 +200,10 @@ document.getElementById('split-type').addEventListener('change', (e) =>{
     const isCustom = e.target.value === 'custom'
     document.getElementById('custom-split').style.display = isCustom ? 'block' : 'none'
     document.getElementById('start-day-wrapper').style.display = isCustom ? 'none' : 'block'
+    document.getElementById('download-button').style.display = 'none'
+
+    //clear the data for new generate and export
+    lastGeneratedLabels = []
 })
 
 
@@ -189,16 +211,34 @@ document.getElementById('split-type').addEventListener('change', (e) =>{
 // Calculate button
 document.getElementById('calculate-button').addEventListener('click', calculate)
 
+
+let lastGeneratedLabels = [] //store the labels for export button 
+let lastGeneratedDate = null
 //Genrate Split
 document.getElementById('generate-split').addEventListener('click', () =>{
-    
+    lastGeneratedDate = new Date()
     const splitType = document.getElementById('split-type').value
-    const startDay = parseInt(document.getElementById('start-day').value)
+    const startDay = (splitType === 'custom') ? 0 : parseInt(document.getElementById('start-day').value)
+    //parseInt(document.getElementById('start-day').value)
+
+    
+    
+    //document.getElementById('download-button').style.display = 'block'
 
     if(splitType === 'custom'){
         const selects = document.querySelectorAll('.custom-day-select')
         const customDays = Array.from(selects).map(s => s.value)
-        renderSchedule('custom', startDay, customDays)
+        lastGeneratedLabels = renderSchedule(splitType, startDay, customDays)
+        //renderSchedule('custom', startDay, customDays)
     }
-    else renderSchedule(splitType, startDay)
+    else lastGeneratedLabels = renderSchedule(splitType, startDay)
+    //renderSchedule(splitType, startDay)
+
+    document.getElementById('download-button').style.display = 'block'
+})
+
+document.getElementById('download-schedule').addEventListener('click', () => {
+    if (lastGeneratedLabels.length > 0){
+        generateICS(lastGeneratedLabels, lastGeneratedDate)
+    }
 })
