@@ -10,7 +10,10 @@ async function nutritionFacts() {
     resultDiv.innerHTML = '<p>Searching...</p>'
 
     try {
-        const response = await fetch(`/api/search?food=${encodeURIComponent(name)}`)
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 10000)
+        const response = await fetch(`/api/search?food=${encodeURIComponent(name)}`, { signal: controller.signal })
+        clearTimeout(timeout)
 
         if (response.status === 404) {
             resultDiv.innerHTML = '<p>No results found. Try a different food name.</p>'
@@ -35,6 +38,9 @@ async function nutritionFacts() {
         `).join('<hr>')
     } catch (error) {
         console.error(error)
-        resultDiv.innerHTML = '<p style="color:red">Could not connect to server. Make sure the backend is running.</p>'
+        const msg = error.name === 'AbortError'
+            ? 'Request timed out. Try again.'
+            : 'Could not connect to server. Make sure the backend is running.'
+        resultDiv.innerHTML = `<p style="color:red">${msg}</p>`
     }
 }
