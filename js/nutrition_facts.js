@@ -10,7 +10,7 @@ async function nutritionFacts() {
     resultDiv.innerHTML = '<p>Searching...</p>'
 
     try {
-        const response = await fetch(`http://localhost:3000/api/search?food=${encodeURIComponent(name)}`)
+        const response = await fetch(`/api/search?food=${encodeURIComponent(name)}`)
 
         if (response.status === 404) {
             resultDiv.innerHTML = '<p>No results found. Try a different food name.</p>'
