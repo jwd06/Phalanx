@@ -83,11 +83,12 @@
 
             <!--Calorie Offset for Weigth Loss-->
             <div id="calorie-offset-weight-loss" style="display: none;">
-                <label for="calorie-offset-weight-loss">Calorie Offset</label>
+                <label for="calorie-offset-wl">Calorie Offset</label>
                 <select name="calorie-offset-wl" id="calorie-offset-wl">
                     <option value="mild">Mild Weight Loss</option>
                     <option value="normal">Weight Loss</option>
                     <option value="extreme">Extreme Weight Loss</option>
+                    <option value="custom-offset">Custom Offset</option>
                 </select>
                 <br><br>
             </div>
@@ -95,13 +96,20 @@
 
             <!--Calorie Offset for Weigth Gain-->
             <div id="calorie-offset-weight-gain" style="display: none;">
-                <label for="calorie-offset-weight-gain">Calorie Offset</label>
+                <label for="calorie-offset-wg">Calorie Offset</label>
                 <select name="calorie-offset-wg" id="calorie-offset-wg">
                     <option value="mild">Mild Weight Gain</option>
                     <option value="normal">Weight Gain</option>
                     <option value="extreme">Extreme Weight Gain</option>
+                    <option value="custom-offset">Custom Offset</option>
                 </select>
                 <br><br>
+            </div>
+
+            <!--Custom Offset range picker-->
+            <div id="custom-offset-picker" style="display: none;">
+                <label for="custom-offset-input">Choose your Own Offset: </label>
+                <input type="number" id="custom-offset-input" min="0" placeholder="e.g. 300">
             </div>
 
             <!--Macro Nutrient Mode Selector (hidden until Calculate is clicked)-->
@@ -245,19 +253,25 @@
 
         <div id="split-result"></div><br><br>
         <div id="download-button" style="display: none;">
-            <button type="button" id="import-schedule">Import Schedule</button>
-            <p>Download the schedule and add it to you calender</p>
+            <button type="button" id="download-schedule">Download Schedule(.ics)</button>
+            <p>Download the schedule and add it to your calendar</p>
         </div>
         
     </div>
 
     <div id="food-nutrition" class="section" style="display:none">
-        <p>Nutrition Facts — coming soon</p>
+        <label>Search Food Nutrition Value</label><br><br>
+        <input type="text" id="food-name" placeholder="e.g. Chicken Breast">
+        <button onclick="nutritionFacts()">Search</button><br><br>
+        <div id="result-nutrients"></div>
     </div>
 
-    
-    <script src="js/validator.js"></script>
+
+    <footer class="footer">
+        <p>© All rights reserved · Phalanx</p>
+    </footer>
     <script type="module" src="js/app.js"></script>
-    
+    <script src="js/nutrition_facts.js"></script>
+
 </body>
 </html>
