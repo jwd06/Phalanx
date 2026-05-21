@@ -40,7 +40,7 @@ async function nutritionFacts() {
         console.error(error)
         const msg = error.name === 'AbortError'
             ? 'Request timed out. Try again.'
-            : 'Could not connect to server. Make sure the backend is running.'
+            : 'Could not connect to server.'
         resultDiv.innerHTML = `<p style="color:red">${msg}</p>`
     }
 }
