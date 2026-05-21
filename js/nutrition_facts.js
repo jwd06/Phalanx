@@ -25,9 +25,9 @@ async function nutritionFacts() {
         const foods = await response.json()
 
         resultDiv.innerHTML = foods.map(food => `
-            <div>
-                <strong>${food.nameFood}</strong><br><br>
-                <em>Per 100g</em><br>
+            <button class = "collapsible">${food.nameFood}</button>
+            <div class = "content">
+                <br><em>Per ${food.serving}</em><br>
                 <ul>
                     <li>Calories: ${food.calories} kcal</li>
                     <li>Protein: ${food.protein}g</li>
@@ -35,7 +35,7 @@ async function nutritionFacts() {
                     <li>Fat: ${food.fat}g</li>
                 </ul>
             </div>
-        `).join('<hr>')
+        `).join('<br>')
     } catch (error) {
         console.error(error)
         const msg = error.name === 'AbortError'
@@ -44,3 +44,14 @@ async function nutritionFacts() {
         resultDiv.innerHTML = `<p style="color:red">${msg}</p>`
     }
 }
+
+document.getElementById('result-nutrients').addEventListener('click', function(e) {
+    if (!e.target.classList.contains('collapsible')) return
+    e.target.classList.toggle('active')
+    var content = e.target.nextElementSibling
+    if (content.style.maxHeight) {
+        content.style.maxHeight = null
+    } else {
+        content.style.maxHeight = content.scrollHeight + 'px'
+    }
+})
