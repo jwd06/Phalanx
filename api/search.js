@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     if (!foodName) return res.status(400).json({ error: "Missing food parameter" })
 
     try {
-        const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${process.env.USDA_API_KEY}&query=${encodeURIComponent(foodName)}&pageSize=3&dataType=Foundation,SR%20Legacy`
+        const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${process.env.USDA_API_KEY}&query=${encodeURIComponent(foodName)}&pageSize=10&dataType=Survey%20(FNDDS)`
         const response = await fetch(url)
 
         if (!response.ok) throw new Error('USDA API error')
