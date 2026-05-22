@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         }
 
         const fdcIds = data.foods.map(f => f.fdcId)
-        const detailRes = await fetch(`https://api.nal.usda.gov/fdc/v1/foods?api_key=${USDA_API_KEY}`, {
+        const detailRes = await fetch(`https://api.nal.usda.gov/fdc/v1/foods?api_key=${process.env.USDA_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fdcIds })
