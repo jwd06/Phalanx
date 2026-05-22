@@ -30,8 +30,11 @@ export default async function handler(req, res) {
         const portionMap = {}
         for (const food of detailData){
             if (food.foodPortions && food.foodPortions.length > 0){
-                const p = food.foodPortions[0] //returns array of objects, pick first
-                portionMap[food.fdcId] = `${p.portionDescription || p.modifier || 'serving'} (${p.gramWeight}g)`
+                //const p = food.foodPortions[0] //returns array of objects, pick first
+                portionMap[food.fdcId] = food.foodPortions.map(p =>({
+                    description: `${p.portionDescription || p.modifier || 'serving'}`,
+                    gramWeight: p.gramWeight
+                }))
             }
         }
 
@@ -41,7 +44,8 @@ export default async function handler(req, res) {
             protein: getNutrient(food.foodNutrients, 'Protein'),
             carbs: getNutrient(food.foodNutrients, 'Carbohydrate, by difference'),
             fat: getNutrient(food.foodNutrients, 'Total lipid (fat)'),
-            serving: portionMap[food.fdcId] || '100g'
+            portions: portionMap[food.fdcId] || [{description: '100g', gramWeight: 100}]
+            //serving: portionMap[food.fdcId] || '100g'
         }))
 
         res.json(results)
