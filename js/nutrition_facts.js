@@ -47,9 +47,9 @@ async function nutritionFacts() {
                 </label>
                 <ul>
                     <li>Calories: <span class="cal">${food.calories}</span> kcal</li>   
-                    <li>Protein: <span class="pro">${food.protein}</span> g</li>   
-                    <li>Carbs: <span class="carb">${food.carbs}</span> g</li>   
-                    <li>Fat: <span class="fat">${food.fat}</span> g</li> 
+                    <li><i class="fa-solid fa-drumstick-bite"></i> Protein: <span class="pro">${food.protein}</span> g</li>   
+                    <li><i class="fa-solid fa-bread-slice"></i> Carbs: <span class="carb">${food.carbs}</span> g</li>   
+                    <li><i class="fa-solid fa-cheese"></i> Fat: <span class="fat">${food.fat}</span> g</li> 
                 </ul>  
             </div>
             </div>
