@@ -493,3 +493,27 @@ body {
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
 }
+
+
+#result-nutrients i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+    color: #555;
+}
+
+#result-nutrients ul {
+    list-style-type: none;
+    padding-left: 5px;
+}
+
+
+h1 {
+    font-family: "Kaushan Script", cursive;
+    font-size: 3rem;
+    color: #333;
+    text-align: left;
+    margin-top: 20px;
+    letter-spacing: -1px;
+}
+
