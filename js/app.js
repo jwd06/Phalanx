@@ -211,6 +211,22 @@ document.getElementById('split-type').addEventListener('change', (e) =>{
 // Calculate button
 document.getElementById('calculate-button').addEventListener('click', calculate)
 
+// Reset button
+document.getElementById('reset-button').addEventListener('click', () => {
+    document.getElementById('calculator-form').reset()
+    document.getElementById('results').innerHTML = ''
+    document.getElementById('macro-result').innerHTML = ''
+    document.getElementById('mac-mode-selector').style.display = 'none'
+    document.getElementById('macro-slider-selection').style.display = 'none'
+    document.getElementById('results-placeholder').style.display = 'flex'
+    document.getElementById('calorie-offset-weight-loss').style.display = 'none'
+    document.getElementById('calorie-offset-weight-gain').style.display = 'none'
+    document.getElementById('custom-offset-picker').style.display = 'none'
+    document.getElementById('height-metric').style.display = 'block'
+    document.getElementById('height-us').style.display = 'none'
+    document.getElementById('weight').placeholder = 'kg'
+})
+
 
 let lastGeneratedLabels = [] //store the labels for export button 
 let lastGeneratedDate = null
