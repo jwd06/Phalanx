@@ -198,12 +198,22 @@ for (const [key, sliderId] of Object.entries(sliderIds)) {
 
 document.getElementById('split-type').addEventListener('change', (e) =>{
     const isCustom = e.target.value === 'custom'
-    document.getElementById('custom-split').style.display = isCustom ? 'block' : 'none'
-    document.getElementById('start-day-wrapper').style.display = isCustom ? 'none' : 'block'
-    document.getElementById('download-button').style.display = 'none'
+    const startDayWrapper = document.getElementById('start-day-wrapper')
+    const generateBtn = document.getElementById('generate-split')
+    const customFooter = document.getElementById('custom-split-footer')
+    const workoutControls = document.querySelector('.workout-controls')
 
-    //clear the data for new generate and export
+    document.getElementById('custom-split').style.display = isCustom ? 'block' : 'none'
+    document.getElementById('download-button').style.display = 'none'
     lastGeneratedLabels = []
+
+    if (isCustom) {
+        customFooter.appendChild(startDayWrapper)
+        customFooter.appendChild(generateBtn)
+    } else {
+        workoutControls.appendChild(startDayWrapper)
+        workoutControls.appendChild(generateBtn)
+    }
 })
 
 
