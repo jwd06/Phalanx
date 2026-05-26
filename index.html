@@ -1,183 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
-
+    
+    
+    
     <title>Phalanx</title>
     
 </head>
 <body>
-    <!--This is the Title-->
-    <h1>Phalanx</h1>
+    <header class="site-header">   
+        <!--This is the Title-->
+        <h1 class="site-title">Phalanx</h1>
 
-    <!--This is where the input fields will be-->
+        <!--This is where the input fields will be-->
 
-    <div id="top-menu">
-        <ul>
-            <li id="menu-calorie-calculator">
-                <a href="#calorie-calculator"><i class="fa-solid fa-calculator"></i> Calorie Calculator</a>
-            </li>
+        <nav id="top-menu">
+            <ul>
+                <li id="menu-calorie-calculator">
+                    <a href="#calorie-calculator">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span class="full-text">Calorie Calculator</span>
+                        <span class="short-text">Calculator</span>
+                    </a>
+                </li>
 
-            <li id="menu-workout-split">
-                <a href="#workout-split"><i class="fa-solid fa-dumbbell"></i> Workout Split</a>
-            </li>
+                <li id="menu-workout-split">
+                    <a href="#workout-split">
+                        <i class="fa-solid fa-dumbbell"></i>
+                        <span class="full-text">Workout Split</span>
+                        <span class="short-text">Workout</span>
+                    </a>
+                </li>
 
-            <li id="menu-food-nutrition">
-                <a href="#food-nutrition"><i class="fa-solid fa-magnifying-glass"></i> Nutrition Fact</a>
-            </li>
-        </ul>
-    </div>
+                <li id="menu-food-nutrition">
+                    <a href="#food-nutrition">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span class="full-text">Nutrition Fact</span>
+                        <span class="short-text">Nutrition</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
 
     <div id="calorie-calculator" class="section">
 
-        <ul id="unit-switcher">
-            <li id="unit-metric" class="unit-option active-unit">Metric (kg / cm)</li>
-            <li id="unit-us" class="unit-option">US (lbs / ft + in)</li>
-        </ul>
+        <h1 class="calc-title">Calorie Calculator</h1>
+        <p class="calc-subtitle">Calculate your daily calorie needs and macronutrients targets.</p>
 
-        <form id="calculator-form">
-            <label for="age">Age:</label>
-            <input type="number" id="age" name="age" min="0"><br><br>
+        <div class="calc-layout">
 
-            <label for="weight">Weight:</label>
-            <input type="number" id="weight" name="weight" placeholder="kg" min="0"><br><br>
+            <!-- LEFT column: input form -->
+            <div class="calc-form-col">
+                <h2 class="section-heading">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    Your Details
+                </h2>
 
-            <div id="height-metric">
-                <label for="height">Height:</label>
-                <input type="number" id="height" name="height" placeholder="cm" min="0"><br><br>
+                <ul id="unit-switcher">
+                    <li id="unit-metric" class="unit-option active-unit">Metric (kg / cm)</li>
+                    <li id="unit-us" class="unit-option">US (lbs / ft + in)</li>
+                </ul>
+
+                <form id="calculator-form">
+                    <!--Row 1: age + weight-->
+                    <div class="input-grid">
+                        <div class="input-box">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" min="0">
+                        </div>
+                        <div class="input-box">
+                            <label for="weight">Weight</label>
+                            <input type="number" id="weight" name="weight" placeholder="kg" min="0">
+                        </div>
+                    </div>
+
+                    <!--Row 2: height + gender-->
+                    <div class="input-grid" style="margin-top: 0; margin-bottom: 12px;">
+                        <div id="height-metric" class="input-box">
+                            <label for="height">Height</label>
+                            <div class="input-box-inner">
+                                <input type="number" id="height" name="height" placeholder="cm" min="0">
+                            </div>
+                        </div>
+
+                        <div id="height-us" class="input-box" style="display:none">
+                            <label>Height</label>
+                            <div class="input-box-inner">
+                                <input type="number" id="height-ft" name="height-ft" placeholder="ft" min="0">
+                                <input type="number" id="height-in" name="height-in" placeholder="in" min="0" max="11">
+                            </div>
+                        </div>
+
+                        <div class="input-box">
+                            <label for="gender">Gender</label>
+                            <select name="gender" id="gender">
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!--Activity Level (full width)-->
+                    <div class="input-box">
+                        <label for="activity-level">Activity Level</label>
+                        <select name="activity-level" id="activity-level">
+                            <option value="sedentary">Sedentary (little or no exercise)</option>
+                            <option value="light">Light (exercise 1-3 times/week)</option>
+                            <option value="moderate">Moderate (exercise 4-5 times/week)</option>
+                            <option value="active">Active (daily exercise or intense exercise 3-4 times/week)</option>
+                            <option value="very-active">Very Active (intense exercise 6-7 times/week)</option>
+                            <option value="extra-active">Extra Active (physical job)</option>
+                            <option value="athlete">Athlete</option>
+                        </select>
+                    </div>
+
+                    <!--Goal (full width)-->
+                    <div class="input-box">
+                        <label for="goal">Goal</label>
+                        <select name="goal" id="goal">
+                            <option value="maintain-weight">Maintain Weight</option>
+                            <option value="gain-weight">Gain Weight</option>
+                            <option value="lose-weight">Lose Weight</option>
+                        </select>
+                    </div>
+
+                    <!--Calorie Offset for Weight Loss (conditional)-->
+                    <div id="calorie-offset-weight-loss" class="input-box" style="display: none;">
+                        <label for="calorie-offset-wl">Calorie Offset</label>
+                        <select name="calorie-offset-wl" id="calorie-offset-wl">
+                            <option value="mild">Mild Weight Loss</option>
+                            <option value="normal">Weight Loss</option>
+                            <option value="extreme">Extreme Weight Loss</option>
+                            <option value="custom-offset">Custom Offset</option>
+                        </select>
+                    </div>
+
+                    <!--Calorie Offset for Weight Gain (conditional)-->
+                    <div id="calorie-offset-weight-gain" class="input-box" style="display: none;">
+                        <label for="calorie-offset-wg">Calorie Offset</label>
+                        <select name="calorie-offset-wg" id="calorie-offset-wg">
+                            <option value="mild">Mild Weight Gain</option>
+                            <option value="normal">Weight Gain</option>
+                            <option value="extreme">Extreme Weight Gain</option>
+                            <option value="custom-offset">Custom Offset</option>
+                        </select>
+                    </div>
+
+                    <!--Custom Offset (conditional)-->
+                    <div id="custom-offset-picker" class="input-box" style="display: none;">
+                        <label for="custom-offset-input">Custom Offset</label>
+                        <div class="input-box-inner">
+                            <input type="number" id="custom-offset-input" min="0" placeholder="e.g. 300">
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" id="calculate-button">Calculate</button>
+                        <button type="button" id="reset-button">Reset</button>
+                    </div>
+                </form>
             </div>
 
-            <div id="height-us" style="display:none">
-                <label>Height:</label>
-                <input type="number" id="height-ft" name="height-ft" placeholder="ft" min="0">
-                <input type="number" id="height-in" name="height-in" placeholder="in" min="0" max="11"><br><br>
-            </div>
+            <!-- RIGHT column: results -->
+            <div class="calc-results-col">
 
-            <label for="gender">Gender: </label>
-            <select name="gender" id="gender">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-            </select>
-            <br><br>
+                <h2 class="result-heading">
+                    <i class="fa-solid fa-bullseye"></i>
+                    Your Results
+                </h2>
 
-            <label for="activity-level">Activity Level: </label>
-            <select name="activity-level" id="activity-level">
-                <option value="sedentary">Sedentary (little or no exercise)</option>
-                <option value="light">Light (exercise 1-3 times/week)</option>
-                <option value="moderate">Moderate (exercise 4-5 times/week)</option>
-                <option value="active">Active (daily exercise or intense exercise 3-4 times/week)</option>
-                <option value="very-active">Very Active (intense exercise 6-7 times/week)</option>
-                <option value="extra-active">Extra Active (physical job)</option>
-                <option value="athlete">Athlete</option>
-            </select>
-            <br><br>
-
-            <label for="goal">Goal: </label>
-            <select name="goal" id="goal">
-                <option value="maintain-weight">Maintain Weight</option>
-                <option value="gain-weight">Gain Weight</option>
-                <option value="lose-weight">Lose Weight</option>
-            </select>
-            <br><br>
-
-            <!--Calorie Offset for Weigth Loss-->
-            <div id="calorie-offset-weight-loss" style="display: none;">
-                <label for="calorie-offset-wl">Calorie Offset</label>
-                <select name="calorie-offset-wl" id="calorie-offset-wl">
-                    <option value="mild">Mild Weight Loss</option>
-                    <option value="normal">Weight Loss</option>
-                    <option value="extreme">Extreme Weight Loss</option>
-                    <option value="custom-offset">Custom Offset</option>
-                </select>
-                <br><br>
-            </div>
-
-
-            <!--Calorie Offset for Weigth Gain-->
-            <div id="calorie-offset-weight-gain" style="display: none;">
-                <label for="calorie-offset-wg">Calorie Offset</label>
-                <select name="calorie-offset-wg" id="calorie-offset-wg">
-                    <option value="mild">Mild Weight Gain</option>
-                    <option value="normal">Weight Gain</option>
-                    <option value="extreme">Extreme Weight Gain</option>
-                    <option value="custom-offset">Custom Offset</option>
-                </select>
-                <br><br>
-            </div>
-
-            <!--Custom Offset range picker-->
-            <div id="custom-offset-picker" style="display: none;">
-                <label for="custom-offset-input">Choose your Own Offset: </label>
-                <input type="number" id="custom-offset-input" min="0" placeholder="e.g. 300">
-            </div>
-
-            <!--Macro Nutrient Mode Selector (hidden until Calculate is clicked)-->
-            <ul id="mac-mode-selector" style="display: none;">
-                <li id="macro-balanced" class="macro-option active-macro">Balanced</li>
-                <li id="macro-custom" class="macro-option">Create Custom</li>
-            </ul>
-
-            <!--Custom Macro Sliders-->
-            <div id="macro-slider-selection" style="display: none;">
-                <p class="slider-hint">Slide the bars to create your own plan</p>
-                <div class="slider-row">
-                    <label>Protein: <span id="protein-val">–</span></label>
-                    <input type="range" min="5" max="90" value="30" class="slider" id="proteins-slider">
+                <div id="results-placeholder">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    <p class="placeholder-title">Enter your information and calculate</p>
+                    <p class="placeholder-sub">Get personalized calorie recommendations</p>
                 </div>
-                <div class="slider-row">
-                    <label>Carbs: <span id="carbs-val">–</span></label>
-                    <input type="range" min="5" max="90" value="50" class="slider" id="carbohydrates-slider">
+
+                <div id="results"></div>
+
+                <ul id="mac-mode-selector" style="display: none;">
+                    <li id="macro-balanced" class="macro-option active-macro">Balanced</li>
+                    <li id="macro-custom" class="macro-option">Create Custom</li>
+                </ul>
+
+                <div id="macro-slider-selection" style="display: none;">
+                    <p class="slider-hint">Slide the bars to create your own plan</p>
+                    <div class="slider-row">
+                        <label>Protein: <span id="protein-val">–</span></label>
+                        <input type="range" min="5" max="90" value="30" class="slider" id="proteins-slider">
+                    </div>
+                    <div class="slider-row">
+                        <label>Carbs: <span id="carbs-val">–</span></label>
+                        <input type="range" min="5" max="90" value="50" class="slider" id="carbohydrates-slider">
+                    </div>
+                    <div class="slider-row">
+                        <label>Fats: <span id="fats-val">–</span></label>
+                        <input type="range" min="5" max="90" value="20" class="slider" id="fats-slider">
+                    </div>
                 </div>
-                <div class="slider-row">
-                    <label>Fats: <span id="fats-val">–</span></label>
-                    <input type="range" min="5" max="90" value="20" class="slider" id="fats-slider">
-                </div>
+
+                <div id="macro-result"></div>
             </div>
 
-
-
-            <button type="button" id="calculate-button">Calculate</button>
-        </form>
-
-        <div id="results"></div>
-        <div id="macro-result"></div>
+        </div>
 
     </div>
 
     <div id="workout-split" class="section" style="display:none">
-        <h3>Workout Split Builder</h3>
-        <h5>Choose a split or create your custom one</h5>
+        <h1 class="calc-title">Workout Split Builder</h1>
+        <p class="calc-subtitle">Choose a split or create your custom one</p>
         <br>
 
         <form id="split-form">
-            <label for="split-type">Split Type: </label>
-            <select id="split-type">
-                <option value="ppl">Push/Pull/Legs</option>
-                <option value="upper-lower">Upper-Lower</option>
-                <option value="full-body">Full Body</option>
-                <option value="custom">Custom</option>
-            </select><br><br>
+            <div class="workout-controls">
+                <div class="workout-control-group">
+                    <label for="split-type">Split Type: </label>
+                    <select id="split-type">
+                        <option value="ppl">Push/Pull/Legs</option>
+                        <option value="upper-lower">Upper-Lower</option>
+                        <option value="full-body">Full Body</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
 
-            <div id="start-day-wrapper">
-                <label for="start-day">Start Day: </label>
-                <select id="start-day">
-                    <option value="0">Monday</option>
-                    <option value="1">Tuesday</option>
-                    <option value="2">Wednesday</option>
-                    <option value="3">Thursday</option>
-                    <option value="4">Friday</option>
-                    <option value="5">Saturday</option>
-                    <option value="6">Sunday</option>
-                </select><br><br>
+                <div id="start-day-wrapper" class="workout-control-group">
+                    <label for="start-day">Start Day: </label>
+                    <select id="start-day">
+                        <option value="0">Monday</option>
+                        <option value="1">Tuesday</option>
+                        <option value="2">Wednesday</option>
+                        <option value="3">Thursday</option>
+                        <option value="4">Friday</option>
+                        <option value="5">Saturday</option>
+                        <option value="6">Sunday</option>
+                    </select>
+                </div>
+                <button type="button" id="generate-split">
+                    Generate Schedule</button><br><br>
             </div>
-
-            
         </form>
 
         <div id="custom-split" style="display: none;">
@@ -189,7 +256,11 @@
                     <option>Upper</option><option>Lower</option>
                     <option>Full Body</option><option>Chest</option>
                     <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option><option>Rest</option>
+                    <option>Arms</option>
+                    <option>Biceps</option><option>Triceps</option>
+                    <option>Glutes</option><option>Hamstrings</option>
+                    <option>Cardio</option>
+                    <option>Rest</option>
                 </select>
             </label><br><br>
 
@@ -199,7 +270,11 @@
                     <option>Upper</option><option>Lower</option>
                     <option>Full Body</option><option>Chest</option>
                     <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option><option>Rest</option>
+                    <option>Arms</option>
+                    <option>Biceps</option><option>Triceps</option>
+                    <option>Glutes</option><option>Hamstrings</option>
+                    <option>Cardio</option>
+                    <option>Rest</option>
                 </select>
             </label><br><br>
 
@@ -209,7 +284,11 @@
                     <option>Upper</option><option>Lower</option>
                     <option>Full Body</option><option>Chest</option>
                     <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option><option>Rest</option>
+                    <option>Arms</option>
+                    <option>Biceps</option><option>Triceps</option>
+                    <option>Glutes</option><option>Hamstrings</option>
+                    <option>Cardio</option>
+                    <option>Rest</option>
                 </select>
             </label><br><br>
 
@@ -219,7 +298,11 @@
                     <option>Upper</option><option>Lower</option>
                     <option>Full Body</option><option>Chest</option>
                     <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option><option>Rest</option>
+                    <option>Arms</option>
+                    <option>Biceps</option><option>Triceps</option>
+                    <option>Glutes</option><option>Hamstrings</option>
+                    <option>Cardio</option>
+                    <option>Rest</option>
                 </select>
             </label><br><br>
 
@@ -229,7 +312,11 @@
                     <option>Upper</option><option>Lower</option>
                     <option>Full Body</option><option>Chest</option>
                     <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option><option>Rest</option>
+                    <option>Arms</option>
+                    <option>Biceps</option><option>Triceps</option>
+                    <option>Glutes</option><option>Hamstrings</option>
+                    <option>Cardio</option>
+                    <option>Rest</option>
                 </select>
             </label><br><br>
 
@@ -239,7 +326,11 @@
                     <option>Upper</option><option>Lower</option>
                     <option>Full Body</option><option>Chest</option>
                     <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option><option>Rest</option>
+                    <option>Arms</option>
+                    <option>Biceps</option><option>Triceps</option>
+                    <option>Glutes</option><option>Hamstrings</option>
+                    <option>Cardio</option>
+                    <option>Rest</option>
                 </select>
             </label><br><br>
 
@@ -249,16 +340,22 @@
                     <option>Upper</option><option>Lower</option>
                     <option>Full Body</option><option>Chest</option>
                     <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option><option>Rest</option>
+                    <option>Arms</option>
+                    <option>Biceps</option><option>Triceps</option>
+                    <option>Glutes</option><option>Hamstrings</option>
+                    <option>Cardio</option>
+                    <option>Rest</option>
                 </select>
             </label><br><br>
         </div>
 
-        <button type="button" id="generate-split">Generate Schedule</button><br><br>
 
         <div id="split-result"></div><br><br>
         <div id="download-button" style="display: none;">
-            <button type="button" id="download-schedule">Download Schedule(.ics)</button>
+            <button type="button" id="download-schedule">
+                <i class="fa-regular fa-calendar"></i>
+                Download Schedule(.ics)
+            </button>
             <p>Download the schedule and add it to your calendar</p>
         </div>
         
