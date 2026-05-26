@@ -37,6 +37,8 @@ export default function calculate() {
     const dropDownCalorieOffsetGL = document.getElementById("calorie-offset-wg").value
     const customOffset = parseFloat(document.getElementById("custom-offset-input").value) || 0
 
+    document.getElementById('results-placeholder').style.display = 'none'
+
     const error = validationInputs(inputAge, inputWeight, inputHeight, currentUnit)
     if (error){
         const errorMsg = document.getElementById("results")
@@ -63,10 +65,33 @@ export default function calculate() {
     }
 
     document.getElementById("results").innerHTML = `
-        <p>BMI: ${bmiResult.toFixed(2)} Range: ${bmiRangeRes}</p>
-        <p>BMR: ${bmrResult.toFixed(0)} kcal/day</p>
-        <p>TDEE: ${tdeeResult.toFixed(0)} kcal/day</p>
-        <p>Goal Calories: ${goalCalories.toFixed(0)} kcal/day</p>
+        <div class="result-grid">
+
+            <div class="result-card">
+                <span class="result-label"><i class="fa-solid fa-fire"></i> Goal Calories</span>
+                <span class="result-value">${goalCalories.toFixed(0)}</span>
+                <span class="result-sub">kcal/day</span>
+            </div>
+
+            <div class="result-card">
+                <span class="result-label"><i class="fa-solid fa-weight-scale"></i> BMI</span>
+                <span class="result-value" style="color:${bmiColor(bmiRangeRes)}">${bmiResult.toFixed(1)}</span>
+                <span class="result-sub" style="color:${bmiColor(bmiRangeRes)}">${bmiRangeRes}</span>
+            </div>
+
+            <div class="result-card">
+                <span class="result-label">BMR</span>
+                <span class="result-value">${bmrResult.toFixed(0)}</span>
+                <span class="result-sub">kcal/day</span>
+            </div>
+
+            <div class="result-card">
+                <span class="result-label">TDEE</span>
+                <span class="result-value">${tdeeResult.toFixed(0)}</span>
+                <span class="result-sub">kcal/day</span>
+            </div>
+
+        </div>
     `
 
     lastGoalCalories = goalCalories
@@ -243,50 +268,50 @@ function renderMacros(goalCalories, inputWeight) {
     const fibre_max  = Math.round(goalCalories * 16.5 / 1000)
 
     document.getElementById('macro-result').innerHTML = `
-        <table class="macro-table">
-            <tr>
-                <td class="macro-label">Protein</td>
-                <td class="macro-value">
-                    <strong>${protein_g} grams/day</strong>
-                    <span class="macro-range">Range: ${protein_range}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Carbs</td>
-                <td class="macro-value">
-                    <strong>${carbs_g} grams/day</strong>
-                    <span class="macro-range">Range: ${carbs_range}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Fat</td>
-                <td class="macro-value">
-                    <strong>${fat_g} grams/day</strong>
-                    <span class="macro-range">Range: ${fat_range}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Sodium</td>
-                <td class="macro-value">
-                    <strong>${sodium_mg} mg/day</strong>
-                    <span class="macro-range">Range: ${sodium_min} – ${sodium_max} mg</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Sugar</td>
-                <td class="macro-value">
-                    <strong>${sugar_g} grams/day</strong>
-                    <span class="macro-range">Range: ${sugar_min} – ${sugar_max} g</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Fibre</td>
-                <td class="macro-value">
-                    <strong>${fibre_g} grams/day</strong>
-                    <span class="macro-range">Range: ${fibre_min} – ${fibre_max} g</span>
-                </td>
-            </tr>
-        </table>
+        <div class="macro-section">
+            <h3 class="macro-heading">Nutrient Targets</h3>
+            <div class="macro-cards">
+                <div class="macro-card">
+                    <span class="macro-card-label">Protein</span>
+                    <span class="macro-card-value">${protein_g} g/day</span>
+                    <span class="macro-card-range">Range: ${protein_range}</span>
+                </div>
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Carbohydrate</span>
+                    <span class="macro-card-value">${carbs_g} g/day</span>
+                    <span class="macro-card-range">Range: ${carbs_range}</span>
+                </div>
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Fat</span>
+                    <span class="macro-card-value">${fat_g} g/day</span>
+                    <span class="macro-card-range">Range: ${fat_range}</span>
+                </div>
+
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Sodium</span>
+                    <span class="macro-card-value">${sodium_mg} mg/day</span>
+                    <span class="macro-card-range">Range: ${sodium_min} – ${sodium_max} mg</span>
+                </div>
+
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Sugar</span>
+                    <span class="macro-card-value">${sugar_g} g/day</span>
+                    <span class="macro-card-range">Range: ${sugar_min} – ${sugar_max} g</span>
+                </div>
+
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Fibre</span>
+                    <span class="macro-card-value">${fibre_g} g/day</span>
+                    <span class="macro-card-range">Range: ${fibre_min} – ${fibre_max} g</span>
+                </div>
+
+            </div>
+        </div>
     `
 }
 
@@ -311,6 +336,18 @@ const bmiRange = (inputWeight, inputHeight) =>
     if (bmiRes <= 34.9) return "Obesity Class I"
     if (bmiRes <= 39.9) return "Obesity Class II"
     return "Obesity Class III (Severe)"
+}
+
+const bmiColor = (range) => {
+    const colors = {
+        "Underweight": "#3b82f6",
+        "Healthy Weight": "#22c55e",
+        "Overweight": "#f59e0b",
+        "Obesity Class I": "#ef4444",
+        "Obesity Class II": "#dc2626",
+        "Obesity Class III (Severe)": "#991b1b"
+    }
+    return colors[range] ?? "#111"
 }
 
 /**
