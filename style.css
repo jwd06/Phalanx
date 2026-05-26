@@ -765,6 +765,31 @@ textarea::placeholder {
     font-weight: 200;
 }
 
+@media (max-width: 480px){
+    .custom-split-body {
+        flex-direction: column;
+    }
+
+    .custom-day-row select {
+        flex: 1;
+    }
+
+    #custom-tip-box {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #custom-split-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    #custom-split-footer #generate-split {
+        width: 100%;
+    }
+}
+
 /* Footer Styling */
 .footer {
     width: 100%;
