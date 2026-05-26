@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -248,105 +248,108 @@
         </form>
 
         <div id="custom-split" style="display: none;">
-            <p style="font-size: 0.9em; color:#555;">Assign each day</p>
-            <!--Repeat for Mon-Sun-->
-            <label>Mon:
-                <select class="custom-day-select">
-                    <option>Push</option><option>Pull</option><option>Legs</option>
-                    <option>Upper</option><option>Lower</option>
-                    <option>Full Body</option><option>Chest</option>
-                    <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option>
-                    <option>Biceps</option><option>Triceps</option>
-                    <option>Glutes</option><option>Hamstrings</option>
-                    <option>Cardio</option>
-                    <option>Rest</option>
-                </select>
-            </label><br><br>
-
-            <label>Tue:
-                <select class="custom-day-select">
-                    <option>Push</option><option>Pull</option><option>Legs</option>
-                    <option>Upper</option><option>Lower</option>
-                    <option>Full Body</option><option>Chest</option>
-                    <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option>
-                    <option>Biceps</option><option>Triceps</option>
-                    <option>Glutes</option><option>Hamstrings</option>
-                    <option>Cardio</option>
-                    <option>Rest</option>
-                </select>
-            </label><br><br>
-
-            <label>Wed:
-                <select class="custom-day-select">
-                    <option>Push</option><option>Pull</option><option>Legs</option>
-                    <option>Upper</option><option>Lower</option>
-                    <option>Full Body</option><option>Chest</option>
-                    <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option>
-                    <option>Biceps</option><option>Triceps</option>
-                    <option>Glutes</option><option>Hamstrings</option>
-                    <option>Cardio</option>
-                    <option>Rest</option>
-                </select>
-            </label><br><br>
-
-            <label>Thur:
-                <select class="custom-day-select">
-                    <option>Push</option><option>Pull</option><option>Legs</option>
-                    <option>Upper</option><option>Lower</option>
-                    <option>Full Body</option><option>Chest</option>
-                    <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option>
-                    <option>Biceps</option><option>Triceps</option>
-                    <option>Glutes</option><option>Hamstrings</option>
-                    <option>Cardio</option>
-                    <option>Rest</option>
-                </select>
-            </label><br><br>
-
-            <label>Fri:
-                <select class="custom-day-select">
-                    <option>Push</option><option>Pull</option><option>Legs</option>
-                    <option>Upper</option><option>Lower</option>
-                    <option>Full Body</option><option>Chest</option>
-                    <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option>
-                    <option>Biceps</option><option>Triceps</option>
-                    <option>Glutes</option><option>Hamstrings</option>
-                    <option>Cardio</option>
-                    <option>Rest</option>
-                </select>
-            </label><br><br>
-
-            <label>Sat:
-                <select class="custom-day-select">
-                    <option>Push</option><option>Pull</option><option>Legs</option>
-                    <option>Upper</option><option>Lower</option>
-                    <option>Full Body</option><option>Chest</option>
-                    <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option>
-                    <option>Biceps</option><option>Triceps</option>
-                    <option>Glutes</option><option>Hamstrings</option>
-                    <option>Cardio</option>
-                    <option>Rest</option>
-                </select>
-            </label><br><br>
-
-            <label>Sun:
-                <select class="custom-day-select">
-                    <option>Push</option><option>Pull</option><option>Legs</option>
-                    <option>Upper</option><option>Lower</option>
-                    <option>Full Body</option><option>Chest</option>
-                    <option>Back</option><option>Shoulders</option>
-                    <option>Arms</option>
-                    <option>Biceps</option><option>Triceps</option>
-                    <option>Glutes</option><option>Hamstrings</option>
-                    <option>Cardio</option>
-                    <option>Rest</option>
-                </select>
-            </label><br><br>
+            <p class="custom-split-label">Training Days</p>
+            <div class="custom-split-body">
+                <div class="custom-days-grid">
+                    <div class="custom-day-row">
+                        <label for="custom-mon">Monday</label>
+                        <select id="custom-mon" class="custom-day-select">
+                            <option>Push</option><option>Pull</option><option>Legs</option>
+                            <option>Upper</option><option>Lower</option>
+                            <option>Full Body</option><option>Chest</option>
+                            <option>Back</option><option>Shoulders</option>
+                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
+                            <option>Glutes</option><option>Hamstrings</option>
+                            <option>Cardio</option><option>Rest</option>
+                        </select>
+                    </div>
+                    <div class="custom-day-row">
+                        <label for="custom-tue">Tuesday</label>
+                        <select id="custom-tue" class="custom-day-select">
+                            <option>Push</option><option>Pull</option><option>Legs</option>
+                            <option>Upper</option><option>Lower</option>
+                            <option>Full Body</option><option>Chest</option>
+                            <option>Back</option><option>Shoulders</option>
+                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
+                            <option>Glutes</option><option>Hamstrings</option>
+                            <option>Cardio</option><option>Rest</option>
+                        </select>
+                    </div>
+                    <div class="custom-day-row">
+                        <label for="custom-wed">Wednesday</label>
+                        <select id="custom-wed" class="custom-day-select">
+                            <option>Push</option><option>Pull</option><option>Legs</option>
+                            <option>Upper</option><option>Lower</option>
+                            <option>Full Body</option><option>Chest</option>
+                            <option>Back</option><option>Shoulders</option>
+                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
+                            <option>Glutes</option><option>Hamstrings</option>
+                            <option>Cardio</option><option>Rest</option>
+                        </select>
+                    </div>
+                    <div class="custom-day-row">
+                        <label for="custom-thu">Thursday</label>
+                        <select id="custom-thu" class="custom-day-select">
+                            <option>Push</option><option>Pull</option><option>Legs</option>
+                            <option>Upper</option><option>Lower</option>
+                            <option>Full Body</option><option>Chest</option>
+                            <option>Back</option><option>Shoulders</option>
+                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
+                            <option>Glutes</option><option>Hamstrings</option>
+                            <option>Cardio</option><option>Rest</option>
+                        </select>
+                    </div>
+                    <div class="custom-day-row">
+                        <label for="custom-fri">Friday</label>
+                        <select id="custom-fri" class="custom-day-select">
+                            <option>Push</option><option>Pull</option><option>Legs</option>
+                            <option>Upper</option><option>Lower</option>
+                            <option>Full Body</option><option>Chest</option>
+                            <option>Back</option><option>Shoulders</option>
+                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
+                            <option>Glutes</option><option>Hamstrings</option>
+                            <option>Cardio</option><option>Rest</option>
+                        </select>
+                    </div>
+                    <div class="custom-day-row">
+                        <label for="custom-sat">Saturday</label>
+                        <select id="custom-sat" class="custom-day-select">
+                            <option>Push</option><option>Pull</option><option>Legs</option>
+                            <option>Upper</option><option>Lower</option>
+                            <option>Full Body</option><option>Chest</option>
+                            <option>Back</option><option>Shoulders</option>
+                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
+                            <option>Glutes</option><option>Hamstrings</option>
+                            <option>Cardio</option><option>Rest</option>
+                        </select>
+                    </div>
+                    <div class="custom-day-row">
+                        <label for="custom-sun">Sunday</label>
+                        <select id="custom-sun" class="custom-day-select">
+                            <option>Push</option><option>Pull</option><option>Legs</option>
+                            <option>Upper</option><option>Lower</option>
+                            <option>Full Body</option><option>Chest</option>
+                            <option>Back</option><option>Shoulders</option>
+                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
+                            <option>Glutes</option><option>Hamstrings</option>
+                            <option>Cardio</option><option>Rest</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="custom-tip-box">
+                    <div class="tip-box-header">
+                        <i class="fa-regular fa-lightbulb"></i>
+                        <span>Tips</span>
+                    </div>
+                    <ul>
+                        <li>Train each muscle group at least twice per week</li>
+                        <li>Include at least one rest day for recovery</li>
+                        <li>Balance your workouts for a well-rounded physique</li>
+                        <li>Choose a split you can stay consistent with</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="custom-split-footer"></div>
         </div>
 
 
