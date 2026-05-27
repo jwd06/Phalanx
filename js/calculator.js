@@ -1,5 +1,6 @@
 import { currentUnit, macroPct } from './app.js'
 import { validationInputs } from './validator.js'
+import { getRecommendedPlan, renderPersonalizedCard } from './personalized-workout.js'
 
 let lastGoalCalories = null
 let lastWeight = null
@@ -96,6 +97,8 @@ export default function calculate() {
 
     lastGoalCalories = goalCalories
     renderMacros(goalCalories, lastWeight)
+    const plan = getRecommendedPlan(dropDownGoal, dropDownActivityLevel)
+    renderPersonalizedCard(plan)
 }
 
 export function refreshMacros() {
