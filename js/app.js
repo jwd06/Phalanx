@@ -1,4 +1,5 @@
 import calculate, { refreshMacros, redistributeCustomMacros } from './calculator.js'
+import { getRecommendedPlan, renderExerciseDetails } from './personalized-workout.js'
 import renderSchedule, { generateICS } from './workout.js'
 
 export let currentUnit = 'metric'
@@ -205,6 +206,7 @@ document.getElementById('split-type').addEventListener('change', (e) =>{
 
     document.getElementById('custom-split').style.display = isCustom ? 'block' : 'none'
     document.getElementById('download-button').style.display = 'none'
+    document.getElementById('exercise-details-section').classList.add("hidden")
     lastGeneratedLabels = []
 
     if (isCustom) {
@@ -235,6 +237,8 @@ document.getElementById('reset-button').addEventListener('click', () => {
     document.getElementById('height-metric').style.display = 'block'
     document.getElementById('height-us').style.display = 'none'
     document.getElementById('weight').placeholder = 'kg'
+    document.getElementById('recommended-plan-card').classList.add('hidden')
+    document.getElementById('exercise-details-section').classList.add('hidden')
 })
 
 
@@ -255,10 +259,14 @@ document.getElementById('generate-split').addEventListener('click', () =>{
         const selects = document.querySelectorAll('.custom-day-select')
         const customDays = Array.from(selects).map(s => s.value)
         lastGeneratedLabels = renderSchedule(splitType, startDay, customDays)
+
         //renderSchedule('custom', startDay, customDays)
     }
     else lastGeneratedLabels = renderSchedule(splitType, startDay)
     //renderSchedule(splitType, startDay)
+
+    const goal = document.getElementById('goal').value
+    renderExerciseDetails(lastGeneratedLabels, goal, splitType)
 
     document.getElementById('download-button').style.display = 'block'
 })
@@ -267,4 +275,24 @@ document.getElementById('download-schedule').addEventListener('click', () => {
     if (lastGeneratedLabels.length > 0){
         generateICS(lastGeneratedLabels, lastGeneratedDate)
     }
+})
+
+document.getElementById('recommended-plan-card').addEventListener('click', (e) => {
+    if (e.target.id !== 'view-workout-btn') return
+
+    const goal = document.getElementById('goal').value
+    const activityLevel = document.getElementById('activity-level').value
+    const plan = getRecommendedPlan(goal, activityLevel)
+
+    selectMenu('workout-split')
+
+    const splitTypeSelect = document.getElementById('split-type')
+    splitTypeSelect.value = plan.splitType
+    splitTypeSelect.dispatchEvent(new Event('change'))
+
+    lastGeneratedLabels = renderSchedule(plan.splitType, 0)
+    lastGeneratedDate = new Date()
+    document.getElementById('download-button').style.display = 'block'
+
+    renderExerciseDetails(lastGeneratedLabels, goal, plan.splitType)
 })
