@@ -1,382 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
+const excercise_db = {
+
+    "Full Body_lose" : [
+        { name: "Squat",              sets: 3, reps: "10-12" },
+        { name: "Bench Press",        sets: 3, reps: "10-12" },
+        { name: "Dumbbell Row",       sets: 3, reps: "10-12" },
+        { name: "Overhead Press",     sets: 3, reps: "10-12" },
+        { name: "Romanian Deadlift",  sets: 3, reps: "10-12" },
+        { name: "Plank",              sets: 3, reps: "30-60s" }
+    ],
+    "Upper_maintain": [
+        { name: "Bench Press",              sets: 3, reps: "8-12" },
+        { name: "Bent Over Row",            sets: 3, reps: "8-12" },
+        { name: "Overhead Press",           sets: 3, reps: "10-12" },
+        { name: "Lat Pulldown",             sets: 3, reps: "10-12" },
+        { name: "Dumbbell Flyes",           sets: 3, reps: "10-12" },
+        { name: "Bicep Curls / Tricep Pushdowns", sets: 3, reps: "10-12" }
+    ],
+    "Lower_maintain": [
+        { name: "Squat",              sets: 3, reps: "8-12" },
+        { name: "Romanian Deadlift",  sets: 3, reps: "10-12" },
+        { name: "Leg Press",          sets: 3, reps: "10-12" },
+        { name: "Lunges",             sets: 3, reps: "12 each" },
+        { name: "Leg Curl",           sets: 3, reps: "10-12" },
+        { name: "Calf Raises",        sets: 3, reps: "10-12" }
+    ],
+    "Push_gain": [
+        { name: "Barbell Bench Press",    sets: 4, reps: "6-8" },
+        { name: "Overhead Press",         sets: 3, reps: "8-10" },
+        { name: "Incline Dumbbell Press", sets: 3, reps: "10-12" },
+        { name: "Lateral Raises",         sets: 3, reps: "10-12" },
+        { name: "Tricep Dips",            sets: 3, reps: "10-12" },
+        { name: "Skull Crushers",         sets: 3, reps: "10-12" }
+    ],
+    "Pull_gain": [
+        { name: "Deadlift",               sets: 4, reps: "5-6" },
+        { name: "Pull-ups / Lat Pulldown",sets: 4, reps: "8-10" },
+        { name: "Barbell Row",            sets: 3, reps: "8-10" },
+        { name: "Cable Row",              sets: 3, reps: "10-12" },
+        { name: "Face Pulls",             sets: 3, reps: "12-15" },
+        { name: "Barbell Curl",           sets: 3, reps: "10-12" }
+    ],
+    "Legs_gain": [
+        { name: "Barbell Squat",       sets: 4, reps: "6-8" },
+        { name: "Romanian Deadlift",   sets: 3, reps: "10-12" },
+        { name: "Leg Press",           sets: 3, reps: "10-12" },
+        { name: "Walking Lunges",      sets: 3, reps: "12 each" },
+        { name: "Leg Curl",            sets: 3, reps: "10-12" },
+        { name: "Calf Raises",         sets: 4, reps: "12-15" }
+    ]
+}
+
+
+function getRecommendedPlan(goal, activityLevel) {
+
+    //activity multiplier and days
+    const daysMap = {
+        "sedentary" : 3, 
+        "light" : 3,
+        "moderate" : 4,
+        "active" : 5,
+        "very-active" : 5,
+        "extra-active" : 6, 
+        "athlete" : 6
+    }
+
+    const daysPerWeek = daysMap[activityLevel] || 3
+    let splitType, rationale, repScheme
+
+    if (goal === "lose-weight"){
+        splitType = "full-body"
+        repScheme = "10-12 reps · 45-60s rest"
+        rationale = "Full-body compound movements maximize calorie burn every session."
+    }
+    else if (goal === "maintain-weight"){
+        splitType = "upper-lower"
+        repScheme = "8-12 reps · 60-90s rest"
+        rationale = "Upper-Lower balances strength and muscle maintenance across the week."
+    }
+    else {
+        splitType = "ppl"
+        repScheme = "6-10 reps · 2-3 mins rest"
+        rationale = "Push/Pull/Legs maximizes hypertrophy volume per muscle group."
+    }
+
+    return {splitType, daysPerWeek, repScheme, rationale}
     
-    
-    
-    <title>Phalanx</title>
-    
-</head>
-<body>
-    <header class="site-header">   
-        <!--This is the Title-->
-        <h1 class="site-title">Phalanx</h1>
+}
 
-        <!--This is where the input fields will be-->
+function getExercisesForDay(dayType, goal, fallbackGoal = null){
+    const key = `${dayType}_${goal.replace("-weight", "")}`
+    const result = excercise_db[key]
+    if (result && result.length) return result
+    if (fallbackGoal) return excercise_db[`${dayType}_${fallbackGoal}`] || []
+    return []
+}
 
-        <nav id="top-menu">
-            <ul>
-                <li id="menu-calorie-calculator">
-                    <a href="#calorie-calculator">
-                        <i class="fa-solid fa-calculator"></i>
-                        <span class="full-text">Calorie Calculator</span>
-                        <span class="short-text">Calculator</span>
-                    </a>
-                </li>
+function renderExerciseDetails(schedule, goal, splitType = null){
+    const section = document.getElementById("exercise-details-section")
+    if (!section) return
+    const seen = new Set();
+    let html = '<h3 class="exercise-section-title">Exercise Details</h3>'
 
-                <li id="menu-workout-split">
-                    <a href="#workout-split">
-                        <i class="fa-solid fa-dumbbell"></i>
-                        <span class="full-text">Workout Split</span>
-                        <span class="short-text">Workout</span>
-                    </a>
-                </li>
+    const splitToGoal = { "ppl": "gain", "upper-lower": "maintain", "full-body": "lose" }
+    const fallbackGoal = splitType ? splitToGoal[splitType] : null
 
-                <li id="menu-food-nutrition">
-                    <a href="#food-nutrition">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span class="full-text">Nutrition Fact</span>
-                        <span class="short-text">Nutrition</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </header>
+    schedule.forEach(label => {
+        if (label === "Rest" || seen.has(label)) return
+        seen.add(label)
 
-    <div id="calorie-calculator" class="section">
+        const exericises = getExercisesForDay(label, goal, fallbackGoal)
+        if (!exericises.length) return
 
-        <h1 class="calc-title">Calorie Calculator</h1>
-        <p class="calc-subtitle">Calculate your daily calorie needs and macronutrients targets.</p>
+        html += `<div class="exercise-day-block">
+        <div class="exercise-day-header">${label} Day</div>
+        <ul class="exercise-list">
+        `
+        exericises.forEach(ex => {
+            html += `<li class="exercise-row">
+            <span class="exercise-name">${ex.name}</span>
+            <span class="exercise-volume">${ex.sets} × ${ex.reps}</span>
+            </li>
+            `
+        })
 
-        <div class="calc-layout">
-
-            <!-- LEFT column: input form -->
-            <div class="calc-form-col">
-                <h2 class="section-heading">
-                    <i class="fa-solid fa-heart-pulse"></i>
-                    Your Details
-                </h2>
-
-                <ul id="unit-switcher">
-                    <li id="unit-metric" class="unit-option active-unit">Metric (kg / cm)</li>
-                    <li id="unit-us" class="unit-option">US (lbs / ft + in)</li>
-                </ul>
-
-                <form id="calculator-form">
-                    <!--Row 1: age + weight-->
-                    <div class="input-grid">
-                        <div class="input-box">
-                            <label for="age">Age</label>
-                            <input type="number" id="age" name="age" min="0">
-                        </div>
-                        <div class="input-box">
-                            <label for="weight">Weight</label>
-                            <input type="number" id="weight" name="weight" placeholder="kg" min="0">
-                        </div>
-                    </div>
-
-                    <!--Row 2: height + gender-->
-                    <div class="input-grid" style="margin-top: 0; margin-bottom: 12px;">
-                        <div id="height-metric" class="input-box">
-                            <label for="height">Height</label>
-                            <div class="input-box-inner">
-                                <input type="number" id="height" name="height" placeholder="cm" min="0">
-                            </div>
-                        </div>
-
-                        <div id="height-us" class="input-box" style="display:none">
-                            <label>Height</label>
-                            <div class="input-box-inner">
-                                <input type="number" id="height-ft" name="height-ft" placeholder="ft" min="0">
-                                <input type="number" id="height-in" name="height-in" placeholder="in" min="0" max="11">
-                            </div>
-                        </div>
-
-                        <div class="input-box">
-                            <label for="gender">Gender</label>
-                            <select name="gender" id="gender">
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!--Activity Level (full width)-->
-                    <div class="input-box">
-                        <label for="activity-level">Activity Level</label>
-                        <select name="activity-level" id="activity-level">
-                            <option value="sedentary">Sedentary (little or no exercise)</option>
-                            <option value="light">Light (exercise 1-3 times/week)</option>
-                            <option value="moderate">Moderate (exercise 4-5 times/week)</option>
-                            <option value="active">Active (daily exercise or intense exercise 3-4 times/week)</option>
-                            <option value="very-active">Very Active (intense exercise 6-7 times/week)</option>
-                            <option value="extra-active">Extra Active (physical job)</option>
-                            <option value="athlete">Athlete</option>
-                        </select>
-                    </div>
-
-                    <!--Goal (full width)-->
-                    <div class="input-box">
-                        <label for="goal">Goal</label>
-                        <select name="goal" id="goal">
-                            <option value="maintain-weight">Maintain Weight</option>
-                            <option value="gain-weight">Gain Weight</option>
-                            <option value="lose-weight">Lose Weight</option>
-                        </select>
-                    </div>
-
-                    <!--Calorie Offset for Weight Loss (conditional)-->
-                    <div id="calorie-offset-weight-loss" class="input-box" style="display: none;">
-                        <label for="calorie-offset-wl">Calorie Offset</label>
-                        <select name="calorie-offset-wl" id="calorie-offset-wl">
-                            <option value="mild">Mild Weight Loss</option>
-                            <option value="normal">Weight Loss</option>
-                            <option value="extreme">Extreme Weight Loss</option>
-                            <option value="custom-offset">Custom Offset</option>
-                        </select>
-                    </div>
-
-                    <!--Calorie Offset for Weight Gain (conditional)-->
-                    <div id="calorie-offset-weight-gain" class="input-box" style="display: none;">
-                        <label for="calorie-offset-wg">Calorie Offset</label>
-                        <select name="calorie-offset-wg" id="calorie-offset-wg">
-                            <option value="mild">Mild Weight Gain</option>
-                            <option value="normal">Weight Gain</option>
-                            <option value="extreme">Extreme Weight Gain</option>
-                            <option value="custom-offset">Custom Offset</option>
-                        </select>
-                    </div>
-
-                    <!--Custom Offset (conditional)-->
-                    <div id="custom-offset-picker" class="input-box" style="display: none;">
-                        <label for="custom-offset-input">Custom Offset</label>
-                        <div class="input-box-inner">
-                            <input type="number" id="custom-offset-input" min="0" placeholder="e.g. 300">
-                        </div>
-                    </div>
-
-                    <div class="button-group">
-                        <button type="button" id="calculate-button">Calculate</button>
-                        <button type="button" id="reset-button">Reset</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- RIGHT column: results -->
-            <div class="calc-results-col">
-
-                <h2 class="result-heading">
-                    <i class="fa-solid fa-bullseye"></i>
-                    Your Results
-                </h2>
-
-                <div id="results-placeholder">
-                    <i class="fa-solid fa-heart-pulse"></i>
-                    <p class="placeholder-title">Enter your information and calculate</p>
-                    <p class="placeholder-sub">Get personalized calorie recommendations</p>
-                </div>
-
-                <div id="results"></div>
-
-                <ul id="mac-mode-selector" style="display: none;">
-                    <li id="macro-balanced" class="macro-option active-macro">Balanced</li>
-                    <li id="macro-custom" class="macro-option">Create Custom</li>
-                </ul>
-
-                <div id="macro-slider-selection" style="display: none;">
-                    <p class="slider-hint">Slide the bars to create your own plan</p>
-                    <div class="slider-row">
-                        <label>Protein: <span id="protein-val">–</span></label>
-                        <input type="range" min="5" max="90" value="30" class="slider" id="proteins-slider">
-                    </div>
-                    <div class="slider-row">
-                        <label>Carbs: <span id="carbs-val">–</span></label>
-                        <input type="range" min="5" max="90" value="50" class="slider" id="carbohydrates-slider">
-                    </div>
-                    <div class="slider-row">
-                        <label>Fats: <span id="fats-val">–</span></label>
-                        <input type="range" min="5" max="90" value="20" class="slider" id="fats-slider">
-                    </div>
-                </div>
-
-                <div id="macro-result"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <div id="workout-split" class="section" style="display:none">
-        <h1 class="calc-title">Workout Split Builder</h1>
-        <p class="calc-subtitle">Choose a split or create your custom one</p>
-        <br>
-
-        <form id="split-form">
-            <div class="workout-controls">
-                <div class="workout-control-group">
-                    <label for="split-type">Split Type: </label>
-                    <select id="split-type">
-                        <option value="ppl">Push/Pull/Legs</option>
-                        <option value="upper-lower">Upper-Lower</option>
-                        <option value="full-body">Full Body</option>
-                        <option value="custom">Custom</option>
-                    </select>
-                </div>
-
-                <div id="start-day-wrapper" class="workout-control-group">
-                    <label for="start-day">Start Day: </label>
-                    <select id="start-day">
-                        <option value="0">Monday</option>
-                        <option value="1">Tuesday</option>
-                        <option value="2">Wednesday</option>
-                        <option value="3">Thursday</option>
-                        <option value="4">Friday</option>
-                        <option value="5">Saturday</option>
-                        <option value="6">Sunday</option>
-                    </select>
-                </div>
-                <button type="button" id="generate-split">
-                    Generate Schedule</button><br><br>
-            </div>
-        </form>
-
-        <div id="custom-split" style="display: none;">
-            <p class="custom-split-label">Training Days</p>
-            <div class="custom-split-body">
-                <div class="custom-days-grid">
-                    <div class="custom-day-row">
-                        <label for="custom-mon">Monday</label>
-                        <select id="custom-mon" class="custom-day-select">
-                            <option>Push</option><option>Pull</option><option>Legs</option>
-                            <option>Upper</option><option>Lower</option>
-                            <option>Full Body</option><option>Chest</option>
-                            <option>Back</option><option>Shoulders</option>
-                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
-                            <option>Glutes</option><option>Hamstrings</option>
-                            <option>Cardio</option><option>Rest</option>
-                        </select>
-                    </div>
-                    <div class="custom-day-row">
-                        <label for="custom-tue">Tuesday</label>
-                        <select id="custom-tue" class="custom-day-select">
-                            <option>Push</option><option>Pull</option><option>Legs</option>
-                            <option>Upper</option><option>Lower</option>
-                            <option>Full Body</option><option>Chest</option>
-                            <option>Back</option><option>Shoulders</option>
-                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
-                            <option>Glutes</option><option>Hamstrings</option>
-                            <option>Cardio</option><option>Rest</option>
-                        </select>
-                    </div>
-                    <div class="custom-day-row">
-                        <label for="custom-wed">Wednesday</label>
-                        <select id="custom-wed" class="custom-day-select">
-                            <option>Push</option><option>Pull</option><option>Legs</option>
-                            <option>Upper</option><option>Lower</option>
-                            <option>Full Body</option><option>Chest</option>
-                            <option>Back</option><option>Shoulders</option>
-                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
-                            <option>Glutes</option><option>Hamstrings</option>
-                            <option>Cardio</option><option>Rest</option>
-                        </select>
-                    </div>
-                    <div class="custom-day-row">
-                        <label for="custom-thu">Thursday</label>
-                        <select id="custom-thu" class="custom-day-select">
-                            <option>Push</option><option>Pull</option><option>Legs</option>
-                            <option>Upper</option><option>Lower</option>
-                            <option>Full Body</option><option>Chest</option>
-                            <option>Back</option><option>Shoulders</option>
-                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
-                            <option>Glutes</option><option>Hamstrings</option>
-                            <option>Cardio</option><option>Rest</option>
-                        </select>
-                    </div>
-                    <div class="custom-day-row">
-                        <label for="custom-fri">Friday</label>
-                        <select id="custom-fri" class="custom-day-select">
-                            <option>Push</option><option>Pull</option><option>Legs</option>
-                            <option>Upper</option><option>Lower</option>
-                            <option>Full Body</option><option>Chest</option>
-                            <option>Back</option><option>Shoulders</option>
-                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
-                            <option>Glutes</option><option>Hamstrings</option>
-                            <option>Cardio</option><option>Rest</option>
-                        </select>
-                    </div>
-                    <div class="custom-day-row">
-                        <label for="custom-sat">Saturday</label>
-                        <select id="custom-sat" class="custom-day-select">
-                            <option>Push</option><option>Pull</option><option>Legs</option>
-                            <option>Upper</option><option>Lower</option>
-                            <option>Full Body</option><option>Chest</option>
-                            <option>Back</option><option>Shoulders</option>
-                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
-                            <option>Glutes</option><option>Hamstrings</option>
-                            <option>Cardio</option><option>Rest</option>
-                        </select>
-                    </div>
-                    <div class="custom-day-row">
-                        <label for="custom-sun">Sunday</label>
-                        <select id="custom-sun" class="custom-day-select">
-                            <option>Push</option><option>Pull</option><option>Legs</option>
-                            <option>Upper</option><option>Lower</option>
-                            <option>Full Body</option><option>Chest</option>
-                            <option>Back</option><option>Shoulders</option>
-                            <option>Arms</option><option>Biceps</option><option>Triceps</option>
-                            <option>Glutes</option><option>Hamstrings</option>
-                            <option>Cardio</option><option>Rest</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="custom-tip-box">
-                    <div class="tip-box-header">
-                        <i class="fa-regular fa-lightbulb"></i>
-                        <span>Tips</span>
-                    </div>
-                    <ul>
-                        <li>Train each muscle group at least twice per week</li>
-                        <li>Include at least one rest day for recovery</li>
-                        <li>Balance your workouts for a well-rounded physique</li>
-                        <li>Choose a split you can stay consistent with</li>
-                    </ul>
-                </div>
-            </div>
-            <div id="custom-split-footer"></div>
-        </div>
-
-
-        <div id="split-result"></div><br><br>
-        <div id="download-button" style="display: none;">
-            <button type="button" id="download-schedule">
-                <i class="fa-regular fa-calendar"></i>
-                Download Schedule(.ics)
-            </button>
-            <p>Download the schedule and add it to your calendar</p>
-        </div>
+        html += `</ul></div>`
         
-    </div>
+    })
+    section.innerHTML = html
+    section.classList.remove("hidden")
+}
 
-    <div id="food-nutrition" class="section" style="display:none">
-        <label>Search Food Nutrition Value</label><br><br>
-        <input type="text" id="food-name" placeholder="e.g. Chicken Breast">
-        <button onclick="nutritionFacts()">Search</button><br><br>
-        <div id="result-nutrients"></div>
-    </div>
+function renderPersonalizedCard(plan){
+    const card = document.getElementById("recommended-plan-card")
+    if (!card) return
+
+    const splitLabels = {
+        "full-body": "Full Body Split",
+        "upper-lower" : "Upper-Lower Split",
+        "ppl" : "Push / Pull / Legs Split"
+    }
+
+    card.innerHTML = `
+    
+        <div class="plan-card">
+            <div class="plan-card-header">
+                <i class="fa-solid fa-dumbbell"></i>
+                <h3>Recommended workout Plan</h3>
+            </div>
+            <div class="plan-card-body">
+                <div class="plan-split-name">${splitLabels[plan.splitType]}</div>
+                <div class="plan-meta">${plan.daysPerWeek} days/week &nbsp; ·&nbsp; ${plan.repScheme}</div>
+                <p class="plan-rationale">${plan.rationale}</p>
+                <button id="view-workout-btn">View in Workout Tab →</button>
+            </div>
+        </div>
+    `
+    card.classList.remove("hidden")
+}
+
+export {getRecommendedPlan, renderPersonalizedCard, renderExerciseDetails}
 
 
-    <footer class="footer">
-        <p>© All rights reserved · Phalanx</p>
-    </footer>
-    <script type="module" src="js/app.js"></script>
-    <script src="js/nutrition_facts.js"></script>
 
-</body>
-</html>
+
