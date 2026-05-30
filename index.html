@@ -122,6 +122,33 @@
                         </select>
                     </div>
 
+                    <!--Diabetes-->
+                    <div class="input-box" id="diabetes-box">
+                        <label>Do You Have Diabetes?</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="diabetes" id="diabetes-no" value="no" checked>No
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="diabetes" id="diabetes-yes" value="yes">Yes
+                            </label>
+                       
+                        </div>
+                    </div>
+
+                    <!--Kidney Disease-->
+                    <div class="input-box" id="kidney-box" style="display: none">
+                        <label>Do you have Kidney Disease? (Diabetic Nephropathy)</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="kidney" id="kidney-no" value="no" checked>No
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="kidney" id="kidney-yes" value="yes">Yes
+                            </label>
+                        </div>
+                    </div>
+
                     <!--Goal (full width)-->
                     <div class="input-box">
                         <label for="goal">Goal</label>
@@ -138,7 +165,7 @@
                         <select name="calorie-offset-wl" id="calorie-offset-wl">
                             <option value="mild">Mild Weight Loss</option>
                             <option value="normal">Weight Loss</option>
-                            <option value="extreme">Extreme Weight Loss</option>
+                            <option value="extreme" id="extreme-wl">Extreme Weight Loss</option>
                             <option value="custom-offset">Custom Offset</option>
                         </select>
                     </div>
@@ -149,7 +176,7 @@
                         <select name="calorie-offset-wg" id="calorie-offset-wg">
                             <option value="mild">Mild Weight Gain</option>
                             <option value="normal">Weight Gain</option>
-                            <option value="extreme">Extreme Weight Gain</option>
+                            <option value="extreme" id="extreme-wg">Extreme Weight Gain</option>
                             <option value="custom-offset">Custom Offset</option>
                         </select>
                     </div>
