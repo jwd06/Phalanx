@@ -395,10 +395,31 @@
     </div>
 
     <div id="food-nutrition" class="section" style="display:none">
-        <label>Search Food Nutrition Value</label><br><br>
-        <input type="text" id="food-name" placeholder="e.g. Chicken Breast">
-        <button onclick="nutritionFacts()">Search</button><br><br>
+
+        <h1 class="calc-title">Nutrition Lookup</h1>
+        <p class="calc-subtitle">Search any food to see its calories and macros per serving.</p>
+
+        <h2 class="section-heading">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Search Food
+        </h2>
+        
+        <div class="input-box">
+            <label for="food-name">Food Name</label>
+            <input type="text" id="food-name" placeholder="e.g. Whole Eggs">
+        </div>
+        
+        <div class="button-group">
+            <button id="nutrition-search-btn" onclick="nutritionFacts()">Search</button><br><br>
+        </div>
+
         <div id="result-nutrients"></div>
+        <div id="results-placeholder">
+                <i class="fa-solid fa-apple-whole"></i>
+                <p class="placeholder-title">Start typing to search foods</p>
+                <p class="placeholder-sub">Try to be specific with food names</p>
+        </div>
+        
     </div>
 
 
