@@ -190,6 +190,10 @@ body {
     box-sizing: border-box
 }
 
+.input-box input[type="radio"] {
+    width: auto;
+}
+
 .input-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
