@@ -827,53 +827,6 @@ textarea::placeholder {
     gap: 8px;
 }
 
-.collapsible {
-  background-color: #777;
-  color: white;
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 15px;
-}
-
-.active, .collapsible:hover {
-  background-color: #555;
-}
-
-.collapsible:after {
-  content: '\002B';
-  color: white;
-  font-weight: bold;
-  float: right;
-  margin-left: 5px;
-}
-
-.active:after {
-  content: "\2212";
-}
-
-.content {
-  padding: 0 18px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
-  background-color: #f1f1f1;
-}
-
-#result-nutrients i {
-    margin-right: 8px;
-    width: 20px;
-    text-align: center;
-    color: #555;
-}
-
-#result-nutrients ul {
-    list-style-type: none;
-    padding-left: 5px;
-}
 
 .button-group {
     display: flex;
@@ -923,6 +876,11 @@ textarea::placeholder {
     justify-content: center;
     padding: 80px 24px 40px;
     gap: 16px;
+}
+
+#results-placeholder .fa-apple-whole {
+    font-size: 5rem;
+    color: #d0d4dc;
 }
 
 #results-placeholder .fa-heart-pulse {
@@ -1100,4 +1058,137 @@ textarea::placeholder {
     white-space: nowrap;
 }
 
+/*Food nutrition*/
+#nutrition-search-btn {
+    background: #1a73e8;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-bottom: 4px;
+}
+
+#nutrition-search-btn:hover{
+    background: #1558b0;
+}
+
+.collapsible {
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+  padding: 18px 20px;
+  width: 100%;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  text-align: left;
+  outline: none;
+  font-size: 0.95em;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  transition: background 0.15s, border-color 0.15s;
+  margin-top: 8px;
+}
+
+.collapsible.active, .collapsible:hover {
+  background-color: #f0f0f0;
+  border-color: #d0d0d0;
+  color: #1a73e8;
+}
+
+.collapsible:after {
+  content: '\002B';
+  color: #888;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2212";
+  color: #1a73e8;
+}
+
+.content {
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease-out;
+  background-color: transparent;
+}
+
+.content .food-data {
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 16px 18px 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    margin-bottom: 8px;
+}
+/*Portion selector*/
+.content label {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.portion-select {
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.9em;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+    margin-left: 6px;
+    color: #111;
+}
+
+#result-nutrients i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+    color: #555;
+}
+
+/* Icon colors for each macro */
+ #result-nutrients .fa-drumstick-bite { color: #dd7041; }
+ #result-nutrients .fa-bread-slice    { color: #d0a020; }
+ #result-nutrients .fa-cheese         { color: #1f67e2; }
+ #result-nutrients .fa-fire           { color: #e8571a;}
+
+#result-nutrients ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 14px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#result-nutrients ul li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #333;
+    padding: 10px 14px;
+    background: #f9f9f9;
+    border: 1px solid #ebebeb;
+    border-radius: 8px;
+}
+
+#result-nutrients ul li span {
+    margin-left: auto;
+    font-size: 1em;
+    font-weight: 700;
+    color: #111;
+}
 
