@@ -2,7 +2,7 @@ export const ageValid = (age) =>
 {
     if (isNaN(age)) return "Age is required"
     if(!Number.isInteger(age)) return "Age must be a whole number"
-    if (age < 1 || age > 120) return "Age must be between 1 and 120"
+    if (age < 13 || age > 80) return "Age must be between 13 and 80"
 }
 
 export const weightValid = (weight, unit) =>
