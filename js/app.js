@@ -4,6 +4,8 @@ import renderSchedule, { generateICS } from './workout.js'
 
 export let currentUnit = 'metric'
 export const macroPct = { protein: 30, carbs: 50, fat: 20 }
+export let isDiabetic = false 
+export let hasKidneyDisease = false
 
 // Menu navigation
 const menuIds = ['calorie-calculator', 'workout-split', 'food-nutrition']
@@ -97,6 +99,47 @@ document.getElementById('goal').addEventListener('change', (e) =>
         document.getElementById('calorie-offset-weight-gain').style.display = 'none'
     }
 })
+
+
+document.getElementsByName("diabetes").forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        if (e.target.value === "yes"){
+            isDiabetic = true
+            document.getElementById("kidney-box").style.display = 'block'
+            document.getElementById("extreme-wl").style.display = 'none'
+            document.getElementById("extreme-wg").style.display = 'none'
+            // reset Extreme selection to Normal if currently selected
+            if (document.getElementById("calorie-offset-wl").value === "extreme"){
+                document.getElementById("calorie-offset-wl").value = "normal"
+            }
+            if (document.getElementById("calorie-offset-wg").value === "extreme"){
+                document.getElementById("calorie-offset-wg").value = "normal"
+            }
+        }
+        else {
+            isDiabetic = false
+            hasKidneyDisease = false
+            document.getElementById("kidney-box").style.display = 'none'
+            document.getElementById("extreme-wl").style.display = ''
+            document.getElementById("extreme-wg").style.display = ''
+        }
+    })
+})
+
+document.getElementsByName("kidney").forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        if (e.target.value === "yes"){
+            hasKidneyDisease = true
+        }
+        else {
+            hasKidneyDisease = false
+        }
+    })
+})
+
+
+
+
 
 // Macro mode switcher
 const sliderIds   = { protein: 'proteins-slider', carbs: 'carbohydrates-slider', fat: 'fats-slider' }
@@ -239,6 +282,10 @@ document.getElementById('reset-button').addEventListener('click', () => {
     document.getElementById('weight').placeholder = 'kg'
     document.getElementById('recommended-plan-card').classList.add('hidden')
     document.getElementById('exercise-details-section').classList.add('hidden')
+    document.getElementById('kidney-box').style.display = 'none'
+    document.getElementById('extreme-wl').style.display = ''
+    document.getElementById('extreme-wg').style.display = ''
+    isDiabetic = false; hasKidneyDisease = false
 })
 
 
