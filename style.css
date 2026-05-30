@@ -231,6 +231,14 @@ textarea::placeholder {
     cursor: pointer;
 }
 
+@media (max-width: 640px) {
+    #diabetes-box,
+    #kidney-box {
+        box-sizing: border-box;
+        width: 100%;
+    }
+}
+
 @media (max-width: 480px) {
     .input-grid {
         grid-template-columns: 1fr;
@@ -990,6 +998,7 @@ textarea::placeholder {
     margin: 0 0 18px 0;
 
 }
+
 
 #view-workout-btn {
     background: #1a73e8;
