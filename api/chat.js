@@ -1,4 +1,4 @@
-import { chatLimiter, getIp } from './_ratelimit.js'
+import { checkRateLimit, getIp } from './_ratelimit.js'
 
 const dangerWords = [
     'heart attack', 'heart-attack', 'heartattack',
@@ -24,7 +24,7 @@ Safety rules:
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end()
 
-    const { success } = await chatLimiter.limit(getIp(req))
+    const { success } = await checkRateLimit(`phalanx:chat:${getIp(req)}`, 15, 1500)
     if (!success) return res.status(429).json({ error: 'Session expired. Wait for limit to reset.' })
 
     if (!process.env.PHALANX_AI) return res.status(503).json({ error: 'AI service not configured' })
