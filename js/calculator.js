@@ -55,6 +55,8 @@ export default function calculate() {
         document.getElementById("results").innerHTML = `<p style="color:red">Offset Exceeds Safe Limit
         for Diabetic Individuals</p>`
         document.getElementById("macro-result").innerHTML = ''
+        document.getElementById('mac-mode-selector').style.display = 'none'
+        lastGoalCalories = null
         return
     }
 
