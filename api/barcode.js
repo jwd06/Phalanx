@@ -27,11 +27,14 @@ export default async function handler(req, res) {
 
         res.json([{
             nameFood: product.product_name || product.product_name_en || `Product ${upc}`,
-            calories: Math.round(nutrients['energy-kcal_100g'] ?? nutrients['energy-kcal'] ?? 0),
-            protein: Math.round(nutrients['proteins_100g'] ?? nutrients['proteins'] ?? 0),
-            carbs: Math.round(nutrients['carbohydrates_100g'] ?? nutrients['carbohydrates'] ?? 0),
-            fat: Math.round(nutrients['fat_100g'] ?? nutrients['fat'] ?? 0),
-            portions: [{ description: '100g', gramWeight: 100 }]
+            calories: Math.round(nutrients['energy-kcal'] ?? nutrients['energy-kcal_100g'] ?? 0),
+            protein: Math.round(nutrients['proteins'] ?? nutrients['proteins_100g'] ?? 0),
+            carbs: Math.round(nutrients['carbohydrates'] ?? nutrients['carbohydrates_100g'] ?? 0),
+            fat: Math.round(nutrients['fat'] ?? nutrients['fat_100g'] ?? 0),
+            portions: [
+                { description: servingLabel, gramWeight: servingWeight },
+                { description: '100g', gramWeight: 100 }
+            ]
         }])
     } catch (error) {
         console.error(error)
