@@ -1,11 +1,19 @@
+import { searchLimiter, getIp } from './_ratelimit.js'
+
 function getNutrient(nutrients, name) {
     const match = nutrients.find(n => n.nutrientName === name)
     return match ? Math.round(match.value) : 0
 }
 
 export default async function handler(req, res) {
+    if (req.method !== 'GET') return res.status(405).end()
+
+    const { success } = await searchLimiter.limit(getIp(req))
+    if (!success) return res.status(429).json({ error: 'Too many search requests. Please slow down.' })
+
     const foodName = req.query.food
     if (!foodName) return res.status(400).json({ error: "Missing food parameter" })
+    if (foodName.length > 200) return res.status(400).json({ error: "Query too long" })
 
     try {
         const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${process.env.USDA_API_KEY}&query=${encodeURIComponent(foodName)}&pageSize=10&dataType=Survey%20(FNDDS)`
