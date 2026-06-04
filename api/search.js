@@ -1,4 +1,4 @@
-import { searchLimiter, getIp } from './_ratelimit.js'
+import { checkRateLimit, getIp } from './_ratelimit.js'
 
 function getNutrient(nutrients, name) {
     const match = nutrients.find(n => n.nutrientName === name)
@@ -8,7 +8,7 @@ function getNutrient(nutrients, name) {
 export default async function handler(req, res) {
     if (req.method !== 'GET') return res.status(405).end()
 
-    const { success } = await searchLimiter.limit(getIp(req))
+    const { success } = await checkRateLimit(`phalanx:search:${getIp(req)}`, 60, 900)
     if (!success) return res.status(429).json({ error: 'Too many search requests. Please slow down.' })
 
     const foodName = req.query.food
