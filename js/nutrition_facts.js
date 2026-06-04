@@ -8,9 +8,12 @@ async function nutritionFacts() {
     }
 
     resultDiv.innerHTML = '<p>Searching...</p>'
-    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-        ? 'http://localhost:3000'
-        : ''; // Empty string for Vercel (relative path)
+// Set this to your backend tunnel URL (e.g., https://cool-panda.loca.lt) when testing on phone via ngrok
+const TUNNEL_URL = 'https://that-stipend-kangaroo.ngrok-free.dev';
+
+    const API_BASE = TUNNEL_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.match(/^\d+\.\d+\.\d+\.\d+$/))
+        ? `http://${window.location.hostname}:3000`
+        : ''); // Empty string for Vercel (relative path)
 
     try {
         const controller = new AbortController()
@@ -45,20 +48,23 @@ async function nutritionFacts() {
                         ).join('')}
                     </select>
                 </label>
+                <label class="custom-serving-label">
+                    Serving size: <input type="number" class="custom-serving-input" min="1" placeholder="e.g. 50"> g
+                </label>
                 <ul>
-                    <li>Calories: <span class="cal">${food.calories}</span> kcal</li>   
+                    <li><i class="fa-solid fa-fire"></i> Calories: <span class="cal">${food.calories}</span> kcal</li>   
                     <li><i class="fa-solid fa-drumstick-bite"></i> Protein: <span class="pro">${food.protein}</span> g</li>   
                     <li><i class="fa-solid fa-bread-slice"></i> Carbs: <span class="carb">${food.carbs}</span> g</li>   
                     <li><i class="fa-solid fa-cheese"></i> Fat: <span class="fat">${food.fat}</span> g</li> 
                 </ul>  
-            </div>
+                </div>
             </div>
         `).join('<br>')
     } catch (error) {
         console.error(error)
         const msg = error.name === 'AbortError'
             ? 'Request timed out. Try again.'
-            : 'Could not connect to server.'
+            : 'Could not connect to server. Try again'
         resultDiv.innerHTML = `<p style="color:red">${msg}</p>`
     }
 }
@@ -85,4 +91,22 @@ document.getElementById('result-nutrients').addEventListener('change', function(
     content.querySelector('.pro').textContent  = Math.round(content.dataset.protein * scale)
     content.querySelector('.carb').textContent = Math.round(content.dataset.carbs * scale)
     content.querySelector('.fat').textContent  = Math.round(content.dataset.fat * scale)
+
+    //syncing custom serving input 
+    const customInput = content.querySelector('.custom-serving-input')
+    if (customInput) customInput.value = gramWeight
+})
+
+document.getElementById('result-nutrients').addEventListener('input', function(i) {
+    if (!i.target.classList.contains('custom-serving-input')) return
+    const grams = Number(i.target.value)
+    if (!grams || grams <= 0) return
+    const content = i.target.closest('.food-data')
+    const scale = grams / 100
+
+    content.querySelector('.cal').textContent  = Math.round(content.dataset.calories * scale)
+    content.querySelector('.pro').textContent  = Math.round(content.dataset.protein * scale)
+    content.querySelector('.carb').textContent = Math.round(content.dataset.carbs * scale)
+    content.querySelector('.fat').textContent  = Math.round(content.dataset.fat * scale)
+
 })
