@@ -1,9 +1,9 @@
-import { barcodeLimiter, getIp } from './_ratelimit.js'
+import { checkRateLimit, getIp } from './_ratelimit.js'
 
 export default async function handler(req, res) {
     if (req.method !== 'GET') return res.status(405).end()
 
-    const { success } = await barcodeLimiter.limit(getIp(req))
+    const { success } = await checkRateLimit(`phalanx:barcode:${getIp(req)}`, 30, 900)
     if (!success) return res.status(429).json({ error: 'Too many barcode requests. Please slow down.' })
 
     const upc = req.query.upc
