@@ -81,7 +81,7 @@ async function onBarcodeDetected(upc) {
     stopScanner()
 
     const resultDiv = document.getElementById('result-nutrients')
-    const placeholder = document.getElementById('food-results-placeholder')
+    const placeholder = document.getElementById('results-placeholder')
     if (placeholder) placeholder.style.display = 'none'
     resultDiv.innerHTML = '<p>Fetching product details...</p>'
 
