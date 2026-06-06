@@ -9,7 +9,7 @@ async function nutritionFacts() {
 
     resultDiv.innerHTML = '<p>Searching...</p>'
     const placeholder = document.getElementById('results-placeholder')
-    placeholder.style.display = 'none'
+    if (placeholder) placeholder.style.display = 'none'
 
     const TUNNEL_URL = ''
 
