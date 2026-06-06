@@ -8,9 +8,14 @@ function getNutrient(nutrients, name) {
 export default async function handler(req, res) {
     if (req.method !== 'GET') return res.status(405).end()
 
-    const { success } = await checkRateLimit(`phalanx:search:${getIp(req)}`, 60, 900)
-    if (!success) return res.status(429).json({ error: 'Too many search requests. Please slow down.' })
-
+    try {
+        const { success } = await checkRateLimit(`phalanx:search:${getIp(req)}`, 60, 900)
+        if (!success) return res.status(429).json({ error: 'Too many search requests. Please slow down.' })
+    }
+    catch {
+        //Redis Unavailable - fail open and allow the request to fall
+    }
+    
     const foodName = req.query.food
     if (!foodName) return res.status(400).json({ error: "Missing food parameter" })
     if (foodName.length > 200) return res.status(400).json({ error: "Query too long" })
