@@ -2,7 +2,7 @@ let codeReader = null
 let scannerControls = null
 let isScanning = false
 
-// Set this to your ngrok URL only when testing on phone (e.g., 'https://cool-panda.ngrok-free.dev')
+
 const TUNNEL_URL = null;
 
 const API_BASE = TUNNEL_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.match(/^\d+\.\d+\.\d+\.\d+$/))
@@ -81,6 +81,8 @@ async function onBarcodeDetected(upc) {
     stopScanner()
 
     const resultDiv = document.getElementById('result-nutrients')
+    const placeholder = document.getElementById('results-placeholder')
+    if (placeholder) placeholder.style.display = 'none'
     resultDiv.innerHTML = '<p>Fetching product details...</p>'
 
     try {
