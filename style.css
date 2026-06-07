@@ -890,7 +890,16 @@ textarea::placeholder {
     gap: 16px;
 }
 
-#results-placeholder .fa-apple-whole {
+#food-results-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px 40px;
+    gap: 16px;
+}
+
+#food-results-placeholder .fa-apple-whole {
     font-size: 5rem;
     color: #d0d4dc;
 }
