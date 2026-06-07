@@ -140,7 +140,7 @@ document.addEventListener('keydown', (e) => {
 
 function renderNutritionResults(foods) {
     const resultDiv = document.getElementById('result-nutrients')
-    const placeholder = document.getElementById('results-placeholder')
+    const placeholder = document.getElementById('food-results-placeholder')
     if (placeholder) placeholder.style.display = 'none'
     resultDiv.innerHTML = foods.map(food => `
         
