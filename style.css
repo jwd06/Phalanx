@@ -1656,10 +1656,18 @@ textarea::placeholder {
     margin: 32px 0;
 }
 
+.legal-doc .table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 12px 0;
+}
+
 .legal-doc table {
     width: 100%;
+    min-width: 520px;
     border-collapse: collapse;
-    margin: 12px 0;
+    margin: 0;
 }
 
 .legal-doc th,
@@ -1679,4 +1687,37 @@ textarea::placeholder {
     padding: 2px 5px;
     border-radius: 4px;
     font-size: 0.9em;
+    word-break: break-word;
+}
+
+@media (max-width: 600px) {
+    .legal-doc {
+        padding: 24px 16px 56px;
+        line-height: 1.55;
+    }
+
+    .legal-doc h1 {
+        font-size: 1.5rem;
+    }
+
+    .legal-doc h2 {
+        font-size: 1.05rem;
+        margin-top: 26px;
+    }
+
+    .legal-doc h3 {
+        font-size: 0.95rem;
+    }
+
+    .legal-doc ul {
+        padding-left: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .legal-doc th,
+    .legal-doc td {
+        padding: 6px 8px;
+        font-size: 0.85em;
+    }
 }
