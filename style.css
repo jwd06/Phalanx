@@ -58,11 +58,14 @@ body {
     letter-spacing: -1px;
 }
 
+.site-header a {
+    text-decoration: none;
+}
+
 #top-menu {
     flex: 1;
     display: flex;
-    justify-content: center;
-    
+    align-items: center;
 }
 
 #top-menu ul {
@@ -73,8 +76,19 @@ body {
     gap: 50px;
 }
 
-#top-menu ul li {
+#top-menu .main-menu {
     flex: 1;
+    justify-content: center;
+    gap: 24px;
+}
+
+#top-menu .legal-menu {
+    gap: 24px;
+    margin-left: auto;
+}
+
+#top-menu ul li {
+    flex: none;
     text-align: center;
 }
 
@@ -127,11 +141,21 @@ body {
     }
 
     #top-menu {
+        width: 100%;
         justify-content: center;
+        flex-wrap: wrap;
+        row-gap: 10px;
     }
 
     #top-menu ul {
         gap: 40px;
+    }
+
+    #top-menu .legal-menu {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+        gap: 24px;
     }
 
     .full-text {
@@ -1580,3 +1604,79 @@ textarea::placeholder {
     border-color: #1a73e8;
 }
 
+
+/* Legal - Terms and Conditions / Privacy Policy */
+.legal-doc {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+    color: #222;
+    line-height: 1.6;
+}
+
+.legal-doc h1 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 8px;
+}
+
+.legal-doc h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111;
+    margin-top: 20px;
+    margin-bottom: 6px;
+}
+
+.legal-doc h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111;
+    margin-top: 32px;
+    margin-bottom: 8px;
+}
+
+.legal-doc p {
+    margin: 12px 0;
+}
+
+.legal-doc ul {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+.legal-doc li {
+    margin: 6px 0;
+}
+
+.legal-doc hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 32px 0;
+}
+
+.legal-doc table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+}
+
+.legal-doc th,
+.legal-doc td {
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    font-size: 0.95em;
+}
+
+.legal-doc th {
+    background: #f0f0f0;
+}
+
+.legal-doc code {
+    background: #eee;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
