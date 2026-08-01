@@ -2,7 +2,7 @@ export const ageValid = (age) =>
 {
     if (isNaN(age)) return "Age is required"
     if(!Number.isInteger(age)) return "Age must be a whole number"
-    if (age < 1 || age > 120) return "Age must be between 1 and 120"
+    if (age < 13 || age > 80) return "Age must be between 13 and 80"
 }
 
 export const weightValid = (weight, unit) =>
@@ -16,7 +16,7 @@ export const weightValid = (weight, unit) =>
         const weightInLbs = weight * 2.20462
         if (weightInLbs < 1 || weightInLbs > 500) return "Weight must be between 1 and 500 lbs"
     }
-    
+
 }
 
 export const heightValid = (height, unit) =>
@@ -30,7 +30,7 @@ export const heightValid = (height, unit) =>
         const heightInFeet = height / 30.48;
         if (heightInFeet < 1|| heightInFeet > 10) return "Height must be between 1 feet and 10 feet"
     }
-    
+
 }
 
 export const validationInputs = (age, weight, height, unit) =>

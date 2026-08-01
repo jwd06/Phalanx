@@ -13,11 +13,10 @@ export default function renderSchedule(splitType, startDay, customDays = null){
     // Days are 7
     // Formula to rotate schedule based on startday: schedule[(i-startday + 7) % 7]
 
-    const labels = DAYS.map((_, i) => 
+    const labels = DAYS.map((_, i) =>
         (splitType === 'custom') ? schedule[i] : schedule[(i-startDay + 7) % 7]
     )
-    const cells = labels.map((label, i) => { 
-        //const label = (splitType === 'custom') ? schedule[i] : schedule[(i-startDay + 7) % 7]
+    const cells = labels.map((label, i) => {
         const isRest = (label === 'Rest')
         return(
             `
@@ -28,7 +27,7 @@ export default function renderSchedule(splitType, startDay, customDays = null){
             `
         )
     })
-    document.getElementById('split-result').innerHTML = 
+    document.getElementById('split-result').innerHTML =
     `<div class="split-grid">${cells.join("")}</div>`
     return labels
 }
@@ -43,7 +42,7 @@ export function generateICS(labels, startDate = new Date()){
     ]
     const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
 
-    //Generate for 4 weeks 
+    //Generate for 4 weeks
     for (let week = 0; week < 4; week++){
         labels.forEach((label, i) => {
             const eventDate = new Date(startDate)
@@ -83,6 +82,3 @@ export function generateICS(labels, startDate = new Date()){
     link.click()
     URL.revokeObjectURL(link.href)
 }
-
-
-

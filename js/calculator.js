@@ -1,5 +1,6 @@
-import { currentUnit, macroPct } from './app.js'
+import { currentUnit, macroPct, isDiabetic, hasKidneyDisease } from './app.js'
 import { validationInputs } from './validator.js'
+import { getRecommendedPlan, renderPersonalizedCard } from './personalized-workout.js'
 
 let lastGoalCalories = null
 let lastWeight = null
@@ -25,7 +26,7 @@ export default function calculate() {
             inputHeight = (ft * 30.48) + (inches * 2.54)
         }
 
-        
+
     } else {
         inputWeight = parseFloat(document.getElementById("weight").value)
         lastWeight = inputWeight
@@ -37,11 +38,25 @@ export default function calculate() {
     const dropDownCalorieOffsetGL = document.getElementById("calorie-offset-wg").value
     const customOffset = parseFloat(document.getElementById("custom-offset-input").value) || 0
 
+    
+    document.getElementById('results-placeholder').style.display = 'none'
+
     const error = validationInputs(inputAge, inputWeight, inputHeight, currentUnit)
     if (error){
         const errorMsg = document.getElementById("results")
         errorMsg.innerHTML = `<p style="color:red">${error}</p>`
         document.getElementById("macro-result").innerHTML = ''
+        document.getElementById('mac-mode-selector').style.display = 'none'
+        return
+    }
+    
+    const isCustomOffsetActive = (dropDownGoal === 'lose-weight' && dropDownCalorieOffsetWL === 'custom-offset') || (dropDownGoal === 'gain-weight' && dropDownCalorieOffsetGL === 'custom-offset')
+    if (isDiabetic && isCustomOffsetActive && customOffset > 400) {
+        document.getElementById("results").innerHTML = `<p style="color:red">Offset Exceeds Safe Limit
+        for Diabetic Individuals</p>`
+        document.getElementById("macro-result").innerHTML = ''
+        document.getElementById('mac-mode-selector').style.display = 'none'
+        lastGoalCalories = null
         return
     }
 
@@ -51,7 +66,7 @@ export default function calculate() {
         : bmrMEN(inputWeight, inputHeight, inputAge)
     const tdeeResult = tdee(inputWeight, inputHeight, inputAge, dropDownGender, dropDownActivityLevel)
     let goalCalories = calorieGoal(tdeeResult, dropDownGoal, dropDownCalorieOffsetWL, dropDownCalorieOffsetGL, customOffset)
-    const bmiRangeRes = bmiRange(inputWeight, inputHeight)
+    const bmiRangeRes = bmiRange(inputWeight, inputHeight, inputAge, dropDownGender)
 
     if (goalCalories < bmrResult) {
         document.getElementById("results").innerHTML =
@@ -63,14 +78,39 @@ export default function calculate() {
     }
 
     document.getElementById("results").innerHTML = `
-        <p>BMI: ${bmiResult.toFixed(2)} Range: ${bmiRangeRes}</p>
-        <p>BMR: ${bmrResult.toFixed(0)} kcal/day</p>
-        <p>TDEE: ${tdeeResult.toFixed(0)} kcal/day</p>
-        <p>Goal Calories: ${goalCalories.toFixed(0)} kcal/day</p>
+        <div class="result-grid">
+
+            <div class="result-card">
+                <span class="result-label"><i class="fa-solid fa-fire"></i> Goal Calories</span>
+                <span class="result-value">${goalCalories.toFixed(0)}</span>
+                <span class="result-sub">kcal/day</span>
+            </div>
+
+            <div class="result-card">
+                <span class="result-label"><i class="fa-solid fa-weight-scale"></i> BMI</span>
+                <span class="result-value" style="color:${bmiColor(bmiRangeRes)}">${bmiResult.toFixed(1)}</span>
+                <span class="result-sub" style="color:${bmiColor(bmiRangeRes)}">${bmiRangeRes}</span>
+            </div>
+
+            <div class="result-card">
+                <span class="result-label">BMR</span>
+                <span class="result-value">${bmrResult.toFixed(0)}</span>
+                <span class="result-sub">kcal/day</span>
+            </div>
+
+            <div class="result-card">
+                <span class="result-label">TDEE</span>
+                <span class="result-value">${tdeeResult.toFixed(0)}</span>
+                <span class="result-sub">kcal/day</span>
+            </div>
+
+        </div>
     `
 
     lastGoalCalories = goalCalories
     renderMacros(goalCalories, lastWeight)
+    const plan = getRecommendedPlan(dropDownGoal, dropDownActivityLevel)
+    renderPersonalizedCard(plan)
 }
 
 export function refreshMacros() {
@@ -84,7 +124,7 @@ export function refreshMacros() {
 export function redistributeCustomMacros(changedMacro, newVal_g) {
     if (lastGoalCalories === null) return
 
-    //calories per gram of each macro nutrients 
+    //calories per gram of each macro nutrients
     const kcalPerG = { protein: 4, carbs: 4, fat: 9 }
     //stores the entire HTML element, can get value anytime
     const sliders = {
@@ -112,12 +152,12 @@ export function redistributeCustomMacros(changedMacro, newVal_g) {
 
     let new_a_g
     //if the sum is 0, divide equally between 2 macros
-    //otherwise, (remaining_kcal * old_a_kcal)/old sum calculates the calories for one of the 
-    //unchanged macros, 
+    //otherwise, (remaining_kcal * old_a_kcal)/old sum calculates the calories for one of the
+    //unchanged macros,
     //then divide by the calorie density to find the gram of one of the unchanged macro
     if (old_sum === 0) {
         new_a_g = Math.round((remaining_kcal / 2) / kcalPerG[a])
-    } 
+    }
     else {
         new_a_g = Math.round((remaining_kcal * old_a_kcal / old_sum) / kcalPerG[a])
     }
@@ -127,8 +167,6 @@ export function redistributeCustomMacros(changedMacro, newVal_g) {
     let new_b_g = Math.round((remaining_kcal - new_a_g * kcalPerG[a]) / kcalPerG[b])
     new_b_g = Math.max(parseInt(sliders[b].min), Math.min(parseInt(sliders[b].max), new_b_g))
 
-
-    
 
     const finalTotal = (newVal_g * kcalPerG[changedMacro]) + (new_a_g * kcalPerG[a]) + (new_b_g * kcalPerG[b])
     const diff = lastGoalCalories - finalTotal
@@ -163,138 +201,183 @@ function renderMacros(goalCalories, inputWeight) {
     let protein_range, carbs_range, fat_range
 
     if (isCustom) {
-        // Protein: g/kg bodyweight bounds
-        const proteinMin = Math.round(1.0 * inputWeight)
-        const proteinMax = Math.round(2.4 * inputWeight)
-        proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
+        if (isDiabetic && hasKidneyDisease){
+            const proteinMin = Math.round(0.6 * inputWeight)
+            const proteinMax = Math.round(0.8 * inputWeight)
+            proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
 
-        // Fat: % of goal calories
-        const fatMin = Math.round(goalCalories * 0.15 / 9)
-        const fatMax = Math.round(goalCalories * 0.35 / 9)
-        fatSlider.min = fatMin;  fatSlider.max = fatMax
+            const fatMin = Math.round(goalCalories * 0.30 / 9)
+            const fatMax = Math.round(goalCalories * 0.45 / 9)
+            fatSlider.min = fatMin;  fatSlider.max = fatMax
 
-        // Carbs: % of goal calories
-        const carbsMin = Math.round(goalCalories * 0.20 / 4)
-        const carbsMax = Math.round(goalCalories * 0.65 / 4)
-        carbsSlider.min = carbsMin;  carbsSlider.max = carbsMax
+            const carbsMin = Math.round(130)
+            const carbsMax = Math.round(goalCalories * 0.45 / 4)
+            carbsSlider.min = carbsMin;  carbsSlider.max = carbsMax
 
-        // Clamp current values into bounds (in case of mode switch)
-        proteinSlider.value = clampSlider(proteinSlider)
-        fatSlider.value     = clampSlider(fatSlider)
-        carbsSlider.value   = clampSlider(carbsSlider)
+            proteinSlider.value = clampSlider(proteinSlider)
+            fatSlider.value     = clampSlider(fatSlider)
+            carbsSlider.value   = clampSlider(carbsSlider)
 
-        // Enable all three sliders
-        proteinSlider.disabled = false
-        carbsSlider.disabled   = false
-        fatSlider.disabled     = false
+            proteinSlider.disabled = false
+            carbsSlider.disabled   = false
+            fatSlider.disabled     = false
 
-        // Read gram values
-        protein_g = parseInt(proteinSlider.value)
-        carbs_g   = parseInt(carbsSlider.value)
-        fat_g     = parseInt(fatSlider.value)
+            protein_g = parseInt(proteinSlider.value)
+            carbs_g   = parseInt(carbsSlider.value)
+            fat_g     = parseInt(fatSlider.value)
 
-        // Range column shows slider bounds
-        protein_range = `${proteinMin} – ${proteinMax} g`
-        carbs_range   = `${carbsMin} – ${carbsMax} g`
-        fat_range     = `${fatMin} – ${fatMax} g`
+            protein_range = `${proteinMin} – ${proteinMax} g`
+            carbs_range   = `${carbsMin} – ${carbsMax} g`
+            fat_range     = `${fatMin} – ${fatMax} g`
 
-        for (const slider of [proteinSlider, carbsSlider, fatSlider]) {
-            const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100
-            slider.style.background = `linear-gradient(to right, #1a73e8 ${pct}%, #d3d3d3 ${pct}%)`
+            for (const slider of [proteinSlider, carbsSlider, fatSlider]) {
+                const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100
+                slider.style.background = `linear-gradient(to right, #1a73e8 ${pct}%, #d3d3d3 ${pct}%)`
+            }
+        }
+
+        else if (isDiabetic){
+            const proteinMin = Math.round(1.2 * inputWeight)
+            const proteinMax = Math.round(2.0 * inputWeight)
+            proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
+
+            const fatMin = Math.round(goalCalories * 0.30 / 9)
+            const fatMax = Math.round(goalCalories * 0.45 / 9)
+            fatSlider.min = fatMin;  fatSlider.max = fatMax
+
+            const carbsMin = Math.round(goalCalories * 0.25 / 4)
+            const carbsMax = Math.round(goalCalories * 0.45 / 4)
+            carbsSlider.min = carbsMin;  carbsSlider.max = carbsMax
+
+            proteinSlider.value = clampSlider(proteinSlider)
+            fatSlider.value     = clampSlider(fatSlider)
+            carbsSlider.value   = clampSlider(carbsSlider)
+
+            proteinSlider.disabled = false
+            carbsSlider.disabled   = false
+            fatSlider.disabled     = false
+
+            protein_g = parseInt(proteinSlider.value)
+            carbs_g   = parseInt(carbsSlider.value)
+            fat_g     = parseInt(fatSlider.value)
+
+            protein_range = `${proteinMin} – ${proteinMax} g`
+            carbs_range   = `${carbsMin} – ${carbsMax} g`
+            fat_range     = `${fatMin} – ${fatMax} g`
+
+            for (const slider of [proteinSlider, carbsSlider, fatSlider]) {
+                const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100
+                slider.style.background = `linear-gradient(to right, #1a73e8 ${pct}%, #d3d3d3 ${pct}%)`
+            }
+        }
+
+        else {
+            const proteinMin = Math.round(1.0 * inputWeight)
+            const proteinMax = Math.round(2.4 * inputWeight)
+            proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
+
+            const fatMin = Math.round(goalCalories * 0.15 / 9)
+            const fatMax = Math.round(goalCalories * 0.35 / 9)
+            fatSlider.min = fatMin;  fatSlider.max = fatMax
+
+            const carbsMin = Math.round(goalCalories * 0.20 / 4)
+            const carbsMax = Math.round(goalCalories * 0.65 / 4)
+            carbsSlider.min = carbsMin;  carbsSlider.max = carbsMax
+
+            proteinSlider.value = clampSlider(proteinSlider)
+            fatSlider.value     = clampSlider(fatSlider)
+            carbsSlider.value   = clampSlider(carbsSlider)
+
+            proteinSlider.disabled = false
+            carbsSlider.disabled   = false
+            fatSlider.disabled     = false
+
+            protein_g = parseInt(proteinSlider.value)
+            carbs_g   = parseInt(carbsSlider.value)
+            fat_g     = parseInt(fatSlider.value)
+
+            protein_range = `${proteinMin} – ${proteinMax} g`
+            carbs_range   = `${carbsMin} – ${carbsMax} g`
+            fat_range     = `${fatMin} – ${fatMax} g`
+
+            for (const slider of [proteinSlider, carbsSlider, fatSlider]) {
+                const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100
+                slider.style.background = `linear-gradient(to right, #1a73e8 ${pct}%, #d3d3d3 ${pct}%)`
+            }
         }
 
     } else {
-        // Balanced mode — fixed percentage formulas (no bodyweight, no sliders)
-        protein_g = Math.round(goalCalories * 0.236 / 4)
-        carbs_g   = Math.round(goalCalories * 0.517 / 4)
-        fat_g     = Math.round(goalCalories * 0.247 / 9)
+        if (isDiabetic && hasKidneyDisease){
+            protein_g = Math.round(inputWeight * 0.8)
 
-        proteinSlider.disabled = true
-        carbsSlider.disabled   = true
-        fatSlider.disabled     = true
+            const remaining_calories = goalCalories - (protein_g * 4)
+            const carb_calories = remaining_calories * 0.45
+            const fat_calories = remaining_calories * 0.55
 
-        // Range column shows lower – upper bound in grams (same bounds as custom mode)
-        const proteinLow  = Math.round(1.0 * inputWeight)
-        const proteinHigh = Math.round(2.4 * inputWeight)
-        const fatLow      = Math.round(goalCalories * 0.15 / 9)
-        const fatHigh     = Math.round(goalCalories * 0.35 / 9)
-        const carbsLow    = Math.round(goalCalories * 0.20 / 4)
-        const carbsHigh   = Math.round(goalCalories * 0.65 / 4)
+            carbs_g = Math.round(carb_calories / 4)
+            fat_g   = Math.round(fat_calories / 9)
 
-        protein_range = `${proteinLow} – ${proteinHigh} g`
-        carbs_range   = `${carbsLow} – ${carbsHigh} g`
-        fat_range     = `${fatLow} – ${fatHigh} g`
+            proteinSlider.disabled = true
+            carbsSlider.disabled   = true
+            fatSlider.disabled     = true
 
-        /*
-        // Old balanced mode — g/bodyweight approach
-        const proteinMin = Math.round(1.2 * inputWeight)
-        const proteinMax = Math.round(1.6 * inputWeight)
-        const fatMin = Math.round(goalCalories * 0.20 / 9)
-        const fatMax = Math.round(goalCalories * 0.25 / 9)
+            const proteinLow  = Math.round(0.6 * inputWeight)
+            const proteinHigh = Math.round(0.8 * inputWeight)
+            const fatLow      = Math.round(goalCalories * 0.30 / 9)
+            const fatHigh     = Math.round(goalCalories * 0.45 / 9)
+            const carbsLow    = Math.round(130)
+            const carbsHigh   = Math.round(goalCalories * 0.45 / 4)
 
-        proteinSlider.min = proteinMin;  proteinSlider.max = proteinMax
-        fatSlider.min = fatMin;  fatSlider.max = fatMax
+            protein_range = `${proteinLow} – ${proteinHigh} g`
+            carbs_range   = `${carbsLow} – ${carbsHigh} g`
+            fat_range     = `${fatLow} – ${fatHigh} g`
+        }
+        else if (isDiabetic){
+            protein_g = Math.round(goalCalories * 0.23 / 4)
+            carbs_g   = Math.round(goalCalories * 0.35 / 4)
+            fat_g     = Math.round(goalCalories * 0.42 / 9)
 
-        proteinSlider.value = clampSlider(proteinSlider)
-        fatSlider.value     = clampSlider(fatSlider)
+            proteinSlider.disabled = true
+            carbsSlider.disabled   = true
+            fatSlider.disabled     = true
 
-        const protein_g = parseInt(proteinSlider.value)
-        const fat_g     = parseInt(fatSlider.value)
+            const proteinLow  = Math.round(1.2 * inputWeight)
+            const proteinHigh = Math.round(2.0 * inputWeight)
+            const fatLow      = Math.round(goalCalories * 0.30 / 9)
+            const fatHigh     = Math.round(goalCalories * 0.45 / 9)
+            const carbsLow    = Math.round(goalCalories * 0.25 / 4)
+            const carbsHigh   = Math.round(goalCalories * 0.45 / 4)
 
-        carbs_g = Math.round((goalCalories - protein_g * 4 - fat_g * 9) / 4)
-        carbsSlider.value    = carbs_g
-        carbsSlider.disabled = true
+            protein_range = `${proteinLow} – ${proteinHigh} g`
+            carbs_range   = `${carbsLow} – ${carbsHigh} g`
+            fat_range     = `${fatLow} – ${fatHigh} g`
+        }
+        else {
+            protein_g = Math.round(goalCalories * 0.236 / 4)
+            carbs_g   = Math.round(goalCalories * 0.517 / 4)
+            fat_g     = Math.round(goalCalories * 0.247 / 9)
 
-        carbs_min = Math.round((goalCalories - proteinMax * 4 - fatMax * 9) / 4)
-        carbs_max = Math.round((goalCalories - proteinMin * 4 - fatMin * 9) / 4)
-        */
+            proteinSlider.disabled = true
+            carbsSlider.disabled   = true
+            fatSlider.disabled     = true
+
+            const proteinLow  = Math.round(1.0 * inputWeight)
+            const proteinHigh = Math.round(2.4 * inputWeight)
+            const fatLow      = Math.round(goalCalories * 0.15 / 9)
+            const fatHigh     = Math.round(goalCalories * 0.35 / 9)
+            const carbsLow    = Math.round(goalCalories * 0.20 / 4)
+            const carbsHigh   = Math.round(goalCalories * 0.65 / 4)
+
+            protein_range = `${proteinLow} – ${proteinHigh} g`
+            carbs_range   = `${carbsLow} – ${carbsHigh} g`
+            fat_range     = `${fatLow} – ${fatHigh} g`
+        }
     }
-
-    /*
-    // Old g/bodyweight shared bounds (before if/else split)
-    const proteinMin = Math.round(1.2 * inputWeight)
-    const proteinMax = Math.round(1.6 * inputWeight)
-    const fatMin = Math.round(goalCalories * ((isCustom) ? 0.15 : 0.20) / 9)
-    const fatMax = Math.round(goalCalories * ((isCustom) ? 0.35 : 0.25) / 9)
-
-    proteinSlider.min = isCustom ? Math.round(1.0 * inputWeight) : proteinMin
-    proteinSlider.max = isCustom ? Math.round(2.4 * inputWeight) : proteinMax
-    fatSlider.min = fatMin
-    fatSlider.max = fatMax
-
-    // Old AMDR % hard bounds
-    // proteinSlider.min = 10;  proteinSlider.max = 35
-    // carbsSlider.min   = 45;  carbsSlider.max   = 65
-    // fatSlider.min     = 20;  fatSlider.max     = 35
-
-    proteinSlider.value = Math.max(proteinSlider.min, Math.min(proteinSlider.max, parseInt(proteinSlider.value) || proteinSlider.min))
-    fatSlider.value = Math.max(fatSlider.min, Math.min(fatSlider.max, parseInt(fatSlider.value) || fatSlider.min))
-
-    const protein_g = parseInt(proteinSlider.value)
-    const fat_g = parseInt(fatSlider.value)
-    */
-
-    /*
-    // Old AMDR % calculation
-    const protein_g = Math.round((goalCalories * macroPct.protein / 100) / 4)
-    const carbs_g   = Math.round((goalCalories * macroPct.carbs   / 100) / 4)
-    const fat_g     = Math.round((goalCalories * macroPct.fat     / 100) / 9)
-    */
 
     // Update slider label spans
     document.getElementById('protein-val').textContent = protein_g + ' g'
     document.getElementById('carbs-val').textContent   = carbs_g   + ' g'
     document.getElementById('fats-val').textContent    = fat_g     + ' g'
-
-    /*
-    // AMDR (Acceptable Macronutrient Distribution Ranges) from dietary guidelines
-    const protein_min = Math.round(goalCalories * 0.10 / 4)
-    const protein_max = Math.round(goalCalories * 0.35 / 4)
-    const carbs_min   = Math.round(goalCalories * 0.45 / 4)
-    const carbs_max   = Math.round(goalCalories * 0.65 / 4)
-    const fat_min     = Math.round(goalCalories * 0.20 / 9)
-    const fat_max     = Math.round(goalCalories * 0.35 / 9)
-    */
 
     // Micronutrients — scaled to goal calories
     const sodium_mg = Math.min(Math.round(goalCalories), 2300)      // ~1mg/kcal, USDA cap 2300mg
@@ -308,50 +391,50 @@ function renderMacros(goalCalories, inputWeight) {
     const fibre_max  = Math.round(goalCalories * 16.5 / 1000)
 
     document.getElementById('macro-result').innerHTML = `
-        <table class="macro-table">
-            <tr>
-                <td class="macro-label">Protein</td>
-                <td class="macro-value">
-                    <strong>${protein_g} grams/day</strong>
-                    <span class="macro-range">Range: ${protein_range}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Carbs</td>
-                <td class="macro-value">
-                    <strong>${carbs_g} grams/day</strong>
-                    <span class="macro-range">Range: ${carbs_range}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Fat</td>
-                <td class="macro-value">
-                    <strong>${fat_g} grams/day</strong>
-                    <span class="macro-range">Range: ${fat_range}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Sodium</td>
-                <td class="macro-value">
-                    <strong>${sodium_mg} mg/day</strong>
-                    <span class="macro-range">Range: ${sodium_min} – ${sodium_max} mg</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Sugar</td>
-                <td class="macro-value">
-                    <strong>${sugar_g} grams/day</strong>
-                    <span class="macro-range">Range: ${sugar_min} – ${sugar_max} g</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="macro-label">Fibre</td>
-                <td class="macro-value">
-                    <strong>${fibre_g} grams/day</strong>
-                    <span class="macro-range">Range: ${fibre_min} – ${fibre_max} g</span>
-                </td>
-            </tr>
-        </table>
+        <div class="macro-section">
+            <h3 class="macro-heading">Nutrient Targets</h3>
+            <div class="macro-cards">
+                <div class="macro-card">
+                    <span class="macro-card-label">Protein</span>
+                    <span class="macro-card-value">${protein_g} g/day</span>
+                    <span class="macro-card-range">Range: ${protein_range}</span>
+                </div>
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Carbohydrate</span>
+                    <span class="macro-card-value">${carbs_g} g/day</span>
+                    <span class="macro-card-range">Range: ${carbs_range}</span>
+                </div>
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Fat</span>
+                    <span class="macro-card-value">${fat_g} g/day</span>
+                    <span class="macro-card-range">Range: ${fat_range}</span>
+                </div>
+
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Sodium</span>
+                    <span class="macro-card-value">${sodium_mg} mg/day</span>
+                    <span class="macro-card-range">Range: ${sodium_min} – ${sodium_max} mg</span>
+                </div>
+
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Sugar</span>
+                    <span class="macro-card-value">${sugar_g} g/day</span>
+                    <span class="macro-card-range">Range: ${sugar_min} – ${sugar_max} g</span>
+                </div>
+
+
+                <div class="macro-card">
+                    <span class="macro-card-label">Fibre</span>
+                    <span class="macro-card-value">${fibre_g} g/day</span>
+                    <span class="macro-card-range">Range: ${fibre_min} – ${fibre_max} g</span>
+                </div>
+
+            </div>
+        </div>
     `
 }
 
@@ -367,8 +450,12 @@ const bmi = (inputWeight, inputHeight) =>
     return inputWeight / (heightInMeters * heightInMeters)
 }
 
-const bmiRange = (inputWeight, inputHeight) =>
+const bmiRange = (inputWeight, inputHeight, inputAge, gender) =>
 {
+    if (inputAge >= 13 && inputAge <= 17) {
+        const rawBmi = bmi(inputWeight, inputHeight)
+        return calculateLMSPercentile(rawBmi, inputAge, gender)
+    }
     const bmiRes = bmi(inputWeight, inputHeight)
     if (bmiRes < 18.5) return "Underweight"
     if (bmiRes <= 24.9) return "Healthy Weight"
@@ -378,20 +465,83 @@ const bmiRange = (inputWeight, inputHeight) =>
     return "Obesity Class III (Severe)"
 }
 
+const lmsTable = {
+    male: {
+        13: { L: -1.647, M: 20.09, S: 0.1568 },
+        14: { L: -1.774, M: 20.81, S: 0.1561 },
+        15: { L: -1.890, M: 21.44, S: 0.1553 },
+        16: { L: -1.985, M: 21.97, S: 0.1539 },
+        17: { L: -2.063, M: 22.42, S: 0.1526 }
+    },
+    female: {
+        13: { L: -1.554, M: 20.99, S: 0.1450 },
+        14: { L: -1.621, M: 21.60, S: 0.1435 },
+        15: { L: -1.673, M: 22.08, S: 0.1424 },
+        16: { L: -1.712, M: 22.45, S: 0.1416 },
+        17: { L: -1.739, M: 22.70, S: 0.1411 }
+    }
+}
+
+function normalCDF(z) {
+      const t = 1 / (1 + 0.2316419 * Math.abs(z))
+      const d = 0.3989423 * Math.exp(-z * z / 2)
+      const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.7814779 + t * (-1.8212560 + t * 1.3302744))))
+      return z > 0 ? 1 - p : p
+}
+
+function calculateLMSPercentile(rawBmi, inputAge, gender){
+    const { L, M, S} = lmsTable[gender][inputAge]
+    const zScore = (Math.pow((rawBmi / M), L) - 1) / (L * S)
+    const percentile = normalCDF(zScore) * 100
+
+    if (percentile < 5)  return "Underweight"
+    if (percentile < 85) return "Healthy Weight"
+    if (percentile < 95) return "Overweight"
+    return "Obese"
+    
+}
+
+const bmiColor = (range) => {
+    const colors = {
+        "Underweight": "#3b82f6",
+        "Healthy Weight": "#22c55e",
+        "Overweight": "#f59e0b",
+        "Obese": "#ef4444",
+        "Obesity Class I": "#ef4444",
+        "Obesity Class II": "#dc2626",
+        "Obesity Class III (Severe)": "#991b1b"
+    }
+    return colors[range] ?? "#111"
+}
+
 /**
  * Calorie Calculator
- *  Calories — Mifflin-St Jeor Equation:
+ *  Calories — Mifflin-St Jeor Equation (adults 18+):
  * Men:   BMR = 10W + 6.25H - 5A + 5
  * Women: BMR = 10W + 6.25H - 5A - 161
+ *
+ * Henry (2005) Equation (teens 13–17):
+ * Males:   BMR = 15.6W + 266H(m) + 299
+ * Females: BMR = 9.40W + 249H(m) + 462
  */
 
 const bmrMEN = (inputWeight, inputHeight, inputAge) =>
 {
+    // ages 13–17: use Henry (2005) teen equation — Mifflin-St Jeor is not validated under 18
+    if (inputAge >= 13 && inputAge <= 17) {
+        const heightM = inputHeight / 100
+        return (15.6 * inputWeight) + (266 * heightM) + 299
+    }
     return ((10 * inputWeight) + (6.25 * inputHeight) - (5 * inputAge) + 5)
 }
 
 const bmrWOMEN = (inputWeight, inputHeight, inputAge) =>
 {
+    // ages 13–17: use Henry (2005) teen equation — Mifflin-St Jeor is not validated under 18
+    if (inputAge >= 13 && inputAge <= 17) {
+        const heightM = inputHeight / 100
+        return (9.40 * inputWeight) + (249 * heightM) + 462
+    }
     return ((10 * inputWeight) + (6.25 * inputHeight) - (5 * inputAge) - 161)
 }
 
