@@ -4,12 +4,7 @@ const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN
 async function pipeline(commands) {
     const res = await fetch(`${REDIS_URL}/pipeline`, {
         method: 'POST',
-        headers: { 
-            
-            Authorization: `Bearer ${REDIS_TOKEN}`, 
-            'Content-Type': 'application/json' 
-        },
-
+        headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(commands)
     })
     return res.json()

@@ -457,7 +457,6 @@ async function sendMessage(){
    const API_BASE = TUNNEL_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.match(/^\d+\.\d+\.\d+\.\d+$/))
       ? `http://${window.location.hostname}:3000`
       : '');
-
     // Create the AI bubble immediately (empty, will fill as chunks arrive)
     const messages = document.getElementById('chat-message')
     const bubble = document.createElement('div')
@@ -483,7 +482,7 @@ async function sendMessage(){
         if (done) break
         buffer += decoder.decode(value, { stream: true })
 
-        const lines = buffer.split('\n') 
+        const lines = buffer.split('\n')
         buffer = lines.pop() // keep incomplete last line for next read
 
         for (const line of lines) {

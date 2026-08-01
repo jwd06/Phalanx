@@ -1,37 +1,8 @@
 import { checkRateLimit, getIp } from './_ratelimit.js'
 
-let cachedToken = null
-let tokenExpiry = 0
-
-async function getAccessToken() {
-    if (cachedToken && Date.now() < tokenExpiry) return cachedToken
-    const creds = Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64')
-    const res = await fetch('https://oauth.fatsecret.com/connect/token', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Basic ${creds}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'grant_type=client_credentials&scope=basic'
-    })
-    if (!res.ok) throw new Error('FatSecret token request failed')
-    const data = await res.json()
-    cachedToken = data.access_token
-    tokenExpiry = Date.now() + (data.expires_in - 60) * 1000
-    return cachedToken
-}
-
-async function getFoodDetail(foodId, token) {
-    const url = new URL('https://platform.fatsecret.com/rest/server.api')
-    url.searchParams.set('method', 'food.get.v4')
-    url.searchParams.set('food_id', foodId)
-    url.searchParams.set('format', 'json')
-    const res = await fetch(url.toString(), {
-        headers: { 'Authorization': `Bearer ${token}` }
-    })
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.food ?? null
+function getNutrient(nutrients, name) {
+    const match = nutrients.find(n => n.nutrientName === name)
+    return match ? Math.round(match.value) : 0
 }
 
 export default async function handler(req, res) {
@@ -40,67 +11,60 @@ export default async function handler(req, res) {
     try {
         const { success } = await checkRateLimit(`phalanx:search:${getIp(req)}`, 60, 900)
         if (!success) return res.status(429).json({ error: 'Too many search requests. Please slow down.' })
-    } catch {
-        // Redis unavailable — fail open
     }
-
+    catch {
+        //Redis Unavailable - fail open and allow the request to fall
+    }
+    
     const foodName = req.query.food
-    if (!foodName) return res.status(400).json({ error: 'Missing food parameter' })
-    if (foodName.length > 200) return res.status(400).json({ error: 'Query too long' })
+    if (!foodName) return res.status(400).json({ error: "Missing food parameter" })
+    if (foodName.length > 200) return res.status(400).json({ error: "Query too long" })
 
     try {
-        const token = await getAccessToken()
+        const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${process.env.USDA_API_KEY}&query=${encodeURIComponent(foodName)}&pageSize=10&dataType=Survey%20(FNDDS)`
+        const response = await fetch(url)
 
-        const searchUrl = new URL('https://platform.fatsecret.com/rest/server.api')
-        searchUrl.searchParams.set('method', 'foods.search')
-        searchUrl.searchParams.set('search_expression', foodName)
-        searchUrl.searchParams.set('format', 'json')
-        searchUrl.searchParams.set('max_results', '10')
+        if (!response.ok) throw new Error('USDA API error')
 
-        const searchRes = await fetch(searchUrl.toString(), {
-            headers: { 'Authorization': `Bearer ${token}` }
+        const data = await response.json()
+
+        if (!data.foods || data.foods.length === 0) {
+            return res.status(404).json({ message: "No food found" })
+        }
+
+        const fdcIds = data.foods.map(f => f.fdcId)
+        const detailRes = await fetch(`https://api.nal.usda.gov/fdc/v1/foods?api_key=${process.env.USDA_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fdcIds })
         })
-        if (!searchRes.ok) throw new Error('FatSecret search failed')
+        if (!detailRes.ok) throw new Error('USDA detail API error')
+        const detailData = await detailRes.json() 
 
-        const searchData = await searchRes.json()
-        const rawFoods = searchData.foods?.food
-        if (!rawFoods) return res.status(404).json({ message: 'No food found' })
+        const portionMap = {}
+        for (const food of detailData){
+            if (food.foodPortions && food.foodPortions.length > 0){
+                //const p = food.foodPortions[0] //returns array of objects, pick first
+                portionMap[food.fdcId] = food.foodPortions.map(p =>({
+                    description: `${p.portionDescription || p.modifier || 'serving'}`,
+                    gramWeight: p.gramWeight
+                }))
+            }
+        }
 
-        const foodList = Array.isArray(rawFoods) ? rawFoods : [rawFoods]
+        const results = data.foods.map(food => ({
+            nameFood: food.description,
+            calories: getNutrient(food.foodNutrients, 'Energy'),
+            protein: getNutrient(food.foodNutrients, 'Protein'),
+            carbs: getNutrient(food.foodNutrients, 'Carbohydrate, by difference'),
+            fat: getNutrient(food.foodNutrients, 'Total lipid (fat)'),
+            portions: portionMap[food.fdcId] || [{description: '100g', gramWeight: 100}]
+            //serving: portionMap[food.fdcId] || '100g'
+        }))
 
-        const details = await Promise.all(foodList.map(f => getFoodDetail(f.food_id, token)))
-
-        const results = details
-            .filter(Boolean)
-            .map(food => {
-                const raw = food.servings?.serving
-                const servings = Array.isArray(raw) ? raw : (raw ? [raw] : [])
-
-                const base = servings.find(s => s.serving_description?.toLowerCase().includes('100g'))
-                    ?? servings[0]
-                    ?? {}
-
-                const portions = servings
-                    .filter(s => s.metric_serving_amount && parseFloat(s.metric_serving_amount) > 0)
-                    .map(s => ({
-                        description: s.serving_description,
-                        gramWeight: parseFloat(s.metric_serving_amount)
-                    }))
-
-                return {
-                    nameFood: food.food_name,
-                    calories: Math.round(parseFloat(base.calories) || 0),
-                    protein: Math.round(parseFloat(base.protein) || 0),
-                    carbs: Math.round(parseFloat(base.carbohydrate) || 0),
-                    fat: Math.round(parseFloat(base.fat) || 0),
-                    portions: portions.length > 0 ? portions : [{ description: '100g', gramWeight: 100 }]
-                }
-            })
-
-        if (results.length === 0) return res.status(404).json({ message: 'No food found' })
         res.json(results)
     } catch (error) {
         console.error(error)
-        res.status(500).json({ error: 'Internal Server Error' })
+        res.status(500).json({ error: "Internal Server Error" })
     }
 }

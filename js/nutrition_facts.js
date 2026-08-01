@@ -10,8 +10,8 @@ async function nutritionFacts() {
     resultDiv.innerHTML = '<p>Searching...</p>'
     const placeholder = document.getElementById('food-results-placeholder')
     if (placeholder) placeholder.style.display = 'none'
-    
-    const TUNNEL_URL = '';
+
+    const TUNNEL_URL = ''
 
     const API_BASE = TUNNEL_URL || ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.match(/^\d+\.\d+\.\d+\.\d+$/))
         ? `http://${window.location.hostname}:3000`
