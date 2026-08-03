@@ -28,8 +28,13 @@ menuIds.forEach((id) =>
     document.getElementById(`menu-${id}`).addEventListener('click', () => selectMenu(id))
 })
 
-// Mark calorie-calculator active on load
-document.getElementById('menu-calorie-calculator').classList.add('active-menu')
+// Show the section matching the URL hash on load (falls back to calorie-calculator)
+const initialSection = location.hash.replace('#', '')
+if (menuIds.includes(initialSection)) {
+    selectMenu(initialSection)
+} else {
+    document.getElementById('menu-calorie-calculator').classList.add('active-menu')
+}
 
 // Unit switcher
 const switchToMetric = () =>
