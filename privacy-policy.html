@@ -21,9 +21,9 @@
     <div class="legal-doc">
         <h1>Phalanx Privacy Policy</h1>
 
-        <p><strong>Last updated: [Effective Date — e.g., August 1, 2026]</strong></p>
+        <p><strong>Last updated: August 5, 2026</strong></p>
 
-        <p>This Privacy Policy explains how [Your Full Legal Name], an individual operating Phalanx from Canada ("Phalanx," "we," "us," or "our"), collects, uses, shares, and protects information when you use the Phalanx mobile application for iOS (the "App"). Phalanx is available to users worldwide; this Policy is written to address obligations that may apply under Canadian law (PIPEDA and applicable provincial legislation), the EU/UK GDPR, and the US CCPA/CPRA, in addition to general privacy practices. By using the App, you agree to the collection and use of information as described here.</p>
+        <p>This Privacy Policy explains how Jawad Hossain, an individual operating Phalanx from Canada ("Phalanx," "we," "us," or "our"), collects, uses, shares, and protects information when you use the Phalanx mobile application for iOS (the "App"). Phalanx is available to users worldwide; this Policy is written to address obligations that may apply under Canadian law (PIPEDA and applicable provincial legislation), the EU/UK GDPR, and the US CCPA/CPRA, in addition to general privacy practices. By using the App, you agree to the collection and use of information as described here.</p>
 
         <hr>
 
@@ -138,47 +138,7 @@
 
         <h2>13. Contact Us</h2>
         <p>If you have questions about this Privacy Policy, or wish to exercise your privacy rights (including data access, correction, deletion, or export requests), contact us at:</p>
-        <p>[Contact Email — Placeholder]<br>[Legal Name / Address — Placeholder]</p>
-
-        <hr>
-
-        <h2>Reviewer Notes (remove before publishing)</h2>
-        <p>This draft was generated from a direct, evidence-based audit of the current codebase (two rounds: a general codebase audit and a follow-up targeting analytics/tracking, permissions, Sentry configuration, and data-export/encryption gaps), plus your answers to two clarifying questions (global audience; name vendors specifically) and your note that the app is iOS-only. Key findings and decisions behind this draft:</p>
-
-        <p><strong>Confirmed by you, applied above:</strong></p>
-        <ul>
-            <li>Audience is global (you're based in Canada, app targets a worldwide audience) — the draft includes GDPR/UK-GDPR, CCPA/CPRA, and PIPEDA references rather than a US-only policy.</li>
-            <li>Third-party sub-processors are named specifically (OpenRouter, FatSecret, Sentry, Upstash, Clerk, Supabase, RevenueCat) rather than described only by generic category.</li>
-            <li>The App is iOS-only — all Android-specific references (Google Play Store billing, Android Keystore/backup behavior, Android permission strings) have been removed from this draft.</li>
-            <li>Consistent with the companion Terms of Service draft, the operator is treated as an individual/sole proprietor based in Canada — replace <code>[Your Full Legal Name]</code> and <code>[Legal Name / Address]</code> with real details.</li>
-        </ul>
-
-        <p><strong>Material discrepancies found vs. the existing in-app <code>src/app/privacy-policy.tsx</code> — this new draft corrects them:</strong></p>
-        <ul>
-            <li>The current in-app policy claims users can "Export your information" as a right (<code>privacy-policy.tsx:115</code>) — <strong>no export feature exists anywhere in the code.</strong> This draft describes export as a manual request rather than a self-service feature, matching what account deletion (also unimplemented as a button) already does.</li>
-            <li>The current in-app policy lists third parties only by generic category (<code>privacy-policy.tsx:75-85</code>) — this draft names OpenRouter and FatSecret specifically, per your preference; consider updating the in-app screen to match once you're ready.</li>
-            <li>Neither the in-app policy nor <code>CLAUDE.md</code>/<code>AGENTS.md</code> mention that Sentry is configured with <code>sendDefaultPii: true</code> (<code>src/app/_layout.tsx:23</code>), meaning your users' IP addresses are sent to Sentry with every event — this wasn't previously disclosed anywhere.</li>
-            <li>Neither mentions the Sentry feedback widget (<code>Sentry.showFeedbackWidget()</code>, wired at <code>src/app/(tabs)/profile.tsx:176</code>) as a channel that collects name/email/message/screenshot directly into Sentry.</li>
-        </ul>
-
-        <p><strong>Gaps/action items surfaced by the audit, not fixed here (read-only investigation, per your instruction):</strong></p>
-        <ul>
-            <li>The <strong>"Delete Account" row in Profile has no handler</strong> — account deletion is not actually self-service today. This draft phrases the right as "contact us" rather than promising an in-app button.</li>
-            <li><strong>Food photos are not covered by the automated diary-entry deletion job</strong> — the migration that purges diary entries after ~35 days has an acknowledged TODO noting photo cleanup isn't built yet. This draft discloses that gap honestly instead of promising a retention period that isn't real.</li>
-            <li><strong>Microphone and Face ID/biometric permission strings exist in <code>Info.plist</code>/<code>app.json</code> but are not used by any feature.</strong> The microphone permission appears to be an unremoved default from the <code>expo-camera</code> config plugin; the Face ID string appears to be unused boilerplate. Recommend removing both from <code>app.json</code> to reduce your permission footprint and avoid confusing App Store reviewers or users — flagged here rather than fixed, since you asked for read-only investigation this round.</li>
-            <li>No <code>Sentry.setUser()</code> call exists, so crash reports aren't linked to a specific account ID today — this reduces support-ticket usefulness but also reduces PII exposure; worth a deliberate decision either way, not a code accident to "fix" blindly.</li>
-        </ul>
-
-        <p><strong>Still open — replace all bracketed placeholders before publishing:</strong></p>
-        <ul>
-            <li><code>[Your Full Legal Name]</code> / <code>[Legal Name / Address]</code> — your actual legal name and any address you want listed.</li>
-            <li><code>[Effective Date]</code> — the date you intend to publish this Policy.</li>
-            <li><code>[Contact Email]</code> — a real, monitored privacy/support contact address.</li>
-            <li>Whether you need a formal EU/UK representative or Data Protection Officer given GDPR's territorial scope — this depends on your processing volume/nature and is a legal judgment call, not something determinable from code.</li>
-            <li>Whether your current provider agreements (Clerk, Supabase, RevenueCat, Sentry, Upstash, OpenRouter, FatSecret) actually have GDPR-adequate transfer mechanisms in place (e.g., Standard Contractual Clauses) — this requires checking each vendor's own Data Processing Agreement, not something verifiable from this codebase.</li>
-        </ul>
-
-        <p><strong>This document is a draft prepared from a code audit and is not legal advice.</strong> It must be reviewed by a qualified privacy attorney before publication — particularly regarding GDPR obligations for a Canada-based individual serving EU/UK users, whether the health/nutrition data collected here qualifies as a "special category"/sensitive data class requiring explicit consent mechanics beyond what's currently implemented, and whether Canadian provincial law (e.g., Quebec's Law 25) imposes additional requirements beyond PIPEDA.</p>
+        <p>t3mpmail000@gmail.com<br>Jawad Hossain</p>
     </div>
 </body>
 </html>
