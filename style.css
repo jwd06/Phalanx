@@ -1886,6 +1886,11 @@ textarea::placeholder {
     margin-bottom: 16px;
 }
 
+.about-feature-icon i {
+    font-size: 20px;
+    color: #1a73e8;
+}
+
 .about-feature-title {
     font-size: 1rem;
     font-weight: 700;
