@@ -10,10 +10,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet">
 
     <title>About - Phalanx</title>
+    <meta name="description" content="Learn how Phalanx turns nutrition, training, and health data into one clear plan.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Phalanx">
+    <meta property="og:title" content="About Phalanx — AI Nutrition &amp; Training">
+    <meta property="og:description" content="Log less. Know exactly where you stand.">
+    <meta property="og:url" content="https://www.phlnx.org/about.html">
+    <meta property="og:image" content="https://www.phlnx.org/assets/demo-1.png">
+    <meta property="og:image:secure_url" content="https://www.phlnx.org/assets/demo-1.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1920">
+    <meta property="og:image:height" content="1440">
+    <meta property="og:image:alt" content="Two phones showing the Phalanx meal scanner and health dashboard">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About Phalanx — AI Nutrition &amp; Training">
+    <meta name="twitter:description" content="Log less. Know exactly where you stand.">
+    <meta name="twitter:image" content="https://www.phlnx.org/assets/demo-1.png">
+    <meta name="twitter:image:alt" content="Two phones showing the Phalanx meal scanner and health dashboard">
     <link rel="icon" type="image/x-icon" href="/assets/phalanx-favicon-new-32x32.png">
     <link rel="apple-touch-icon" href="/assets/phalanx-icon-new-raw.png">
 </head>
 <body>
+    <div class="about-scroll-progress" aria-hidden="true"></div>
+
     <header class="site-header">
         <h1 class="site-title">Phalanx</h1>
 
@@ -21,7 +40,6 @@
             <ul class="main-menu">
                 <li id="menu-about" class="active-menu">
                     <a href="about.html">
-                        <i class="fa-solid fa-circle-info"></i>
                         <span class="full-text">About</span>
                         <span class="short-text">About</span>
                     </a>
@@ -29,7 +47,6 @@
 
                 <li id="menu-calorie-calculator">
                     <a href="index.html#calorie-calculator">
-                        <i class="fa-solid fa-calculator"></i>
                         <span class="full-text">Calorie Calculator</span>
                         <span class="short-text">Calculator</span>
                     </a>
@@ -37,7 +54,6 @@
 
                 <li id="menu-workout-split">
                     <a href="index.html#workout-split">
-                        <i class="fa-solid fa-dumbbell"></i>
                         <span class="full-text">Workout Split</span>
                         <span class="short-text">Workout</span>
                     </a>
@@ -45,7 +61,6 @@
 
                 <li id="menu-food-nutrition">
                     <a href="index.html#food-nutrition">
-                        <i class="fa-solid fa-magnifying-glass"></i>
                         <span class="full-text">Nutrition Fact</span>
                         <span class="short-text">Nutrition</span>
                     </a>
@@ -61,8 +76,8 @@
             <h1>Log less.<br>Know <span class="about-accent">exactly</span><br>where you stand.</h1>
             <p class="about-hero-sub">Point your camera at a plate and Phalanx identifies the food, estimates the macros, and logs it. Pair that with a real exercise library and health analytics that turn numbers into a plan.</p>
             <div class="about-hero-cta">
-                <a href="#" class="about-store-badge"><img src="assets/app-store-badge.svg" alt="Download on the App Store"></a>
-                <span class="about-hero-note">iOS &middot; Requires iOS 16+</span>
+                <a href="#" class="about-store-badge" aria-label="Phalanx for iOS, coming soon"><img src="assets/app-store-badge.svg" alt="Download on the App Store"></a>
+                <span class="about-hero-note">Coming soon on the App Store &middot; Requires iOS 17+</span>
             </div>
         </div>
         <div class="about-hero-image">
@@ -210,7 +225,8 @@
         <div class="about-cta">
             <h2>Ready to train smarter?</h2>
             <p>Scan a meal, tap a muscle group, see the trend. Free to download, with a subscription to unlock full access.</p>
-            <a href="#" class="about-store-badge"><img src="assets/app-store-badge.svg" alt="Download on the App Store"></a>
+            <a href="#" class="about-store-badge" aria-label="Phalanx for iOS, coming soon"><img src="assets/app-store-badge.svg" alt="Download on the App Store"></a>
+            <span class="about-store-note">Coming soon &middot; Requires iOS 17+</span>
         </div>
     </section>
 
@@ -225,5 +241,8 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="js/about.js"></script>
 </body>
 </html>

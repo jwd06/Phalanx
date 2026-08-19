@@ -91,9 +91,9 @@ body {
     text-decoration: none;
     color: #555;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 0;
     font-size: 0.9rem;
     font-weight: 500;
     transition: background 0.15s, color 0.15s;
@@ -1717,6 +1717,30 @@ textarea::placeholder {
 
 /* ============ About Page ============ */
 
+.about-scroll-progress {
+    position: fixed;
+    z-index: 300;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #1a73e8;
+    transform: scaleX(0);
+    transform-origin: left center;
+    pointer-events: none;
+}
+
+.about-word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+}
+
+.about-word-inner {
+    display: inline-block;
+    will-change: transform;
+}
+
 .about-badge,
 .about-eyebrow {
     display: inline-flex;
@@ -1750,6 +1774,22 @@ textarea::placeholder {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+}
+
+.header-store-availability {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.header-store-availability span {
+    color: #6b7280;
+    font-size: 0.68rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .header-app-store-badge img {
@@ -1826,6 +1866,11 @@ textarea::placeholder {
     display: block;
 }
 
+.about-hero-image,
+.about-showcase-image {
+    overflow: hidden;
+}
+
 /* Stat bar */
 .about-stats {
     max-width: 1200px;
@@ -1873,6 +1918,13 @@ textarea::placeholder {
     border: 1px solid #eee;
     border-radius: 18px;
     padding: 26px;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.about-feature-card:hover {
+    border-color: #dbe8fb;
+    box-shadow: 0 18px 44px rgba(26, 115, 232, 0.1);
+    transform: translateY(-6px);
 }
 
 .about-feature-icon {
@@ -2054,6 +2106,14 @@ textarea::placeholder {
     margin: 0 0 30px;
 }
 
+.about-store-note {
+    display: block;
+    margin-top: 10px;
+    color: #eaf1fd;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
 /* About footer (Terms / Privacy links live here) */
 .about-footer {
     border-top: 1px solid #eee;
@@ -2163,5 +2223,15 @@ textarea::placeholder {
     .about-footer-inner {
         flex-direction: column;
         text-align: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-feature-card {
+        transition: none;
+    }
+
+    .about-feature-card:hover {
+        transform: none;
     }
 }
