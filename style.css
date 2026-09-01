@@ -2008,6 +2008,11 @@ textarea::placeholder {
     padding: 90px 0;
 }
 
+/* A plain showcase that follows a muted band needs its own breathing room. */
+.about-showcase--muted + .about-showcase:not(.about-showcase--muted) {
+    padding-top: 90px;
+}
+
 .about-showcase-inner {
     max-width: 1200px;
     margin: 0 auto;
@@ -2244,6 +2249,10 @@ textarea::placeholder {
 
     .about-showcase {
         padding: 10px 0 56px;
+    }
+
+    .about-showcase--muted + .about-showcase:not(.about-showcase--muted) {
+        padding-top: 56px;
     }
 
     .about-showcase--muted {
